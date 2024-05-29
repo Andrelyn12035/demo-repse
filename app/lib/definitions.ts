@@ -1,6 +1,9 @@
 // This file contains type definitions for your data.
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
+
+import { string } from "zod";
+
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
@@ -85,4 +88,95 @@ export type InvoiceForm = {
   customer_id: string;
   amount: number;
   status: 'pending' | 'paid';
+};
+export type pagoIMSS = {
+  id: string;
+  folioSUA:string;
+  titulo:string;
+  periodo: string;
+  ejercicio: string;
+  lineaCaptura: string;
+  registroPatronal: string;
+  importeIMSS: string;
+  importeRCV: string;
+  importeVIV: string;
+  importeACV: string;
+  totalAPagar: string;
+  banco: string;
+  fechaPago: string;
+  archivo: string;
+  fechaProcesamiento: string;
+  remitente: string;
+  asunto: string;
+};
+
+export type pagoISR = {
+  id: string;
+  titulo:string;
+  lineaCaptura: string;
+  fechaPago: string;
+  totalAPagar: string;
+  banco: string;
+  nombreSolicitante: string; 
+  nombreArchivo: string;
+  fechaProcesamiento: string;
+  remitente: string;
+  asunto: string;
+};
+
+export type declaracionISR = {
+  id: string;
+  rfc: string;
+  razonSocial: string;
+  ejercicio: string;
+  periodo: string;
+  conceptoIVA: string;
+  iva: string;
+  nombreArchivo: string;
+  administracion: string;
+  aCargoISR: string;
+  observacionISRSyS: string;
+  titulo: string;
+  lineaCaptura: string;
+  totalPagado: string;
+  tipoDeclaracion: string;
+  numOperacion: string;
+  fechaProcesamiento: string;
+  remitente: string;
+  asunto: string;
+};
+
+/*
+ID
+Titulo
+LC
+FechaPago
+PeriodoPago
+RazonSocial
+RegistroPatronal
+RFC
+ImporteIMSS
+Total
+Archivo
+FechaProcesamiento
+Remitente
+Asunto
+Ejercicio
+*/
+export type declaracionIMSS = {
+  id: string;
+  titulo:string;
+  lineaCaptura: string;
+  fechaPago: string;
+  periodoPago: string;
+  razonSocial: string;
+  registroPatronal: string;
+  rfc: string;
+  importeIMSS: string;
+  total: string;
+  archivo: string;
+  fechaProcesamiento: string;
+  remitente: string;
+  asunto: string;
+  ejercicio: string;
 };

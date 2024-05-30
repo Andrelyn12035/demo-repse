@@ -2,13 +2,13 @@
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
 
-import { string } from "zod";
+import { string } from 'zod';
 
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
   name: string;
-  email: string;
+  rfc: string;
   password: string;
 };
 
@@ -91,8 +91,8 @@ export type InvoiceForm = {
 };
 export type pagoIMSS = {
   id: string;
-  folioSUA:string;
-  titulo:string;
+  folioSUA: string;
+  titulo: string;
   periodo: string;
   ejercicio: string;
   lineaCaptura: string;
@@ -112,12 +112,12 @@ export type pagoIMSS = {
 
 export type pagoISR = {
   id: string;
-  titulo:string;
+  titulo: string;
   lineaCaptura: string;
   fechaPago: string;
   totalAPagar: string;
   banco: string;
-  nombreSolicitante: string; 
+  nombreSolicitante: string;
   nombreArchivo: string;
   fechaProcesamiento: string;
   remitente: string;
@@ -165,7 +165,7 @@ Ejercicio
 */
 export type declaracionIMSS = {
   id: string;
-  titulo:string;
+  titulo: string;
   lineaCaptura: string;
   fechaPago: string;
   periodoPago: string;

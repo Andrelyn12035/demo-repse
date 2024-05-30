@@ -10,8 +10,14 @@ import {
 } from './definitions';
 import { revenue, invoices, users, customers } from './placeholder-data';
 import { formatCurrency } from './utils';
-import { declaracionIMSS, declaracionISR, pagoIMSS, pagoISR} from './definitions' // for types
+import {
+  declaracionIMSS,
+  declaracionISR,
+  pagoIMSS,
+  pagoISR,
+} from './definitions'; // for types
 import { db } from './db';
+import { RowDataPacket } from 'mysql2';
 
 export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
@@ -93,14 +99,14 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredInvoices(
+export async function fetchFilteredDeclaraciones(
   query: string,
-  currentPage: number,
+  /*currentPage: number,*/
 ) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  /*const offset = (currentPage - 1) * ITEMS_PER_PAGE;*/
 
   try {
-    const invoices = await sql<InvoicesTable>`
+    /*const invoices = await sql<InvoicesTable>`
       SELECT
         invoices.id,
         invoices.amount,
@@ -119,9 +125,18 @@ export async function fetchFilteredInvoices(
         invoices.status ILIKE ${`%${query}%`}
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;
-
-    return invoices.rows;
+    `;*/
+    if (query === '') {
+      const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
+      return rows as declaracionIMSS[];
+    }
+    const [rows, fields] = await db.execute<RowDataPacket[]>(
+      'SELECT * FROM declaracionimss WHERE razonSocial = ?',
+      [query],
+    );
+    console.log(rows);
+    return rows as declaracionIMSS[];
+    //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoices.');
@@ -237,42 +252,40 @@ export async function getUser(email: string) {
 
 export async function getDecIMSS(query: string, data: declaracionIMSS[]) {
   try {
-      const [result] = await db.execute(query, data);
-      await db.end();
-      return result;
+    const [result] = await db.execute(query, data);
+    await db.end();
+    return result;
   } catch (error) {
-      console.log(error);
-      return error;
+    console.log(error);
+    return error;
   }
 }
 export async function getDecISR(query: string, data: declaracionISR[]) {
   try {
-      const [result] = await db.execute(query, data);
-      await db.end();
-      return result;
+    const [result] = await db.execute(query, data);
+    await db.end();
+    return result;
   } catch (error) {
-      console.log(error);
-      return error;
+    console.log(error);
+    return error;
   }
 }
-export async function getPagoIMSS(query: string, data: pagoIMSS[]) {
+export async function getPagoIMSS() {
   try {
-      const [result] = await db.execute(query, data);
-      await db.end();
-      return result;
+    const [rows, fields] = await db.execute('SELECT * FROM pagoimss;');
+    return rows;
   } catch (error) {
-      console.log(error);
-      return error;
+    console.log(error);
+    return error;
   }
 }
 export async function getPagoISR(query: string, data: pagoISR[]) {
   try {
-      const [result] = await db.execute(query, data);
-      await db.end();
-      return result;
+    const [rows, fields] = await db.execute(query, data);
+    await db.end();
+    return rows;
   } catch (error) {
-      console.log(error);
-      return error;
+    console.log(error);
+    return error;
   }
 }
-

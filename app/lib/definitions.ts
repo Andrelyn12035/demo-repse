@@ -10,6 +10,13 @@ export type User = {
   name: string;
   rfc: string;
   password: string;
+  role: string;
+};
+
+export type User2 = {
+  name: string;
+  email: string;
+  image: string;
 };
 
 export type Customer = {

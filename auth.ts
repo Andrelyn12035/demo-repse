@@ -1,32 +1,41 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type DefaultSession } from 'next-auth';
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
-import type { User } from '@/app/lib/definitions';
+import { User, User2 } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
 import { RowDataPacket } from 'mysql2';
+import { Adapter } from 'next-auth/adapters';
 
-async function getUser(rfc: string): Promise<User | undefined> {
+async function getUser(rfc: string): Promise<User2 | undefined> {
   try {
     const [user, fields] = await db.execute<RowDataPacket[]>(
       'SELECT * FROM users WHERE rfc=?',
       [rfc],
     );
-    console.log('user:', user);
-    return user[0] as User;
+    let a = user[0] as User;
+    const n_user = {} as User2;
+    n_user.name = a.id
+    n_user.email = a.name
+    n_user.image = a.role
+    console.log('user get usu:', n_user);
+    return n_user; // Cast the result to User type
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
   }
 }
 
-export const { auth, signIn, signOut } = NextAuth({
+export const { auth, signIn, signOut} = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
+      credentials: {
+        name: {},
+        id: {},
+      },
       async authorize(credentials) {
-        console.log('credentials:', credentials);
         const parsedCredentials = z
           .object({ rfc: z.string(), password: z.string().min(6) })
           .safeParse(credentials);
@@ -39,7 +48,7 @@ export const { auth, signIn, signOut } = NextAuth({
             console.error('User not found:', rfc);
             return null;
           }
-          console.log(user);
+          console.log('si'+JSON.stringify(user));
           return user;
         }
         console.error('Invalid credentials:', parsedCredentials.error);

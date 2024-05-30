@@ -99,42 +99,15 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredDeclaraciones(
+export async function fetchFilteredDeclaracionesIMSS(
   query: string,
-  /*currentPage: number,*/
 ) {
-  /*const offset = (currentPage - 1) * ITEMS_PER_PAGE;*/
-
   try {
-    /*const invoices = await sql<InvoicesTable>`
-      SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;*/
-    if (query === '') {
-      const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
-      return rows as declaracionIMSS[];
-    }
+    
     const [rows, fields] = await db.execute<RowDataPacket[]>(
-      'SELECT * FROM declaracionimss WHERE razonSocial = ?',
+      'SELECT * FROM declaracionimss WHERE id_user = ?',
       [query],
     );
-    console.log(rows);
     return rows as declaracionIMSS[];
     //return invoices.rows;
   } catch (error) {
@@ -142,7 +115,17 @@ export async function fetchFilteredDeclaraciones(
     throw new Error('Failed to fetch invoices.');
   }
 }
-
+export async function fetchDeclaracionesIMSS() {
+  try {
+    
+    const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
+    return rows as declaracionIMSS[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch DeclaracionesIMSS.');
+  }
+}
 export async function fetchInvoicesPages(query: string) {
   try {
     const count = await sql`SELECT COUNT(*)
@@ -250,11 +233,10 @@ export async function getUser(email: string) {
   }
 }
 
-export async function getDecIMSS(query: string, data: declaracionIMSS[]) {
+export async function fetchDecIMSS() {
   try {
-    const [result] = await db.execute(query, data);
-    await db.end();
-    return result;
+    const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
+    return rows;
   } catch (error) {
     console.log(error);
     return error;

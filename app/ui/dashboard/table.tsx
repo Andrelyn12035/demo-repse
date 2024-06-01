@@ -2,7 +2,10 @@ import Image from 'next/image';
 import { UpdateInvoice, DeleteInvoice } from '@/app/ui/dashboard/buttons';
 import InvoiceStatus from '@/app/ui/dashboard/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredDeclaracionesIMSS, fetchDeclaracionesIMSS } from '@/app/lib/data';
+import {
+  fetchFilteredDeclaracionesIMSS,
+  fetchDeclaracionesIMSS,
+} from '@/app/lib/data';
 import { declaracionIMSS } from '@/app/lib/definitions';
 import { auth } from '@/auth';
 export default async function InvoicesTable({
@@ -12,17 +15,17 @@ export default async function InvoicesTable({
   /*currentPage: number;*/
 }) {
   let rows: declaracionIMSS[] = [];
-  const session = await auth()
-  if (session?.user ) {
-    console.log("session user aja: "+JSON.stringify(session.user));
+  const session = await auth();
+  if (session?.user) {
+    console.log('session user aja: ' + JSON.stringify(session.user));
     if (session?.user?.image === '1' || session?.user?.image === '2') {
       rows = await fetchDeclaracionesIMSS();
-    }else{
+    } else {
       rows = await fetchFilteredDeclaracionesIMSS(session.user.image || '');
     }
   }
-  
-   /* currentPage*/
+
+  /* currentPage*/
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">

@@ -153,23 +153,6 @@ export type declaracionISR = {
   asunto: string;
 };
 
-/*
-ID
-Titulo
-LC
-FechaPago
-PeriodoPago
-RazonSocial
-RegistroPatronal
-RFC
-ImporteIMSS
-Total
-Archivo
-FechaProcesamiento
-Remitente
-Asunto
-Ejercicio
-*/
 export type declaracionIMSS = {
   id: string;
   titulo: string;
@@ -187,3 +170,11 @@ export type declaracionIMSS = {
   asunto: string;
   ejercicio: string;
 };
+
+export interface File {
+  name: string;
+  size: number;
+  type: string;
+  extension: string;
+  content: ArrayBuffer;
+}

@@ -99,11 +99,8 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredDeclaracionesIMSS(
-  query: string,
-) {
+export async function fetchFilteredDeclaracionesIMSS(query: string) {
   try {
-    
     const [rows, fields] = await db.execute<RowDataPacket[]>(
       'SELECT * FROM declaracionimss WHERE id_user = ?',
       [query],
@@ -117,7 +114,6 @@ export async function fetchFilteredDeclaracionesIMSS(
 }
 export async function fetchDeclaracionesIMSS() {
   try {
-    
     const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
     return rows as declaracionIMSS[];
     //return invoices.rows;
@@ -270,4 +266,56 @@ export async function getPagoISR(query: string, data: pagoISR[]) {
     console.log(error);
     return error;
   }
+}
+
+export async function readDecIMSS(buffer: Buffer) {
+  const { createWorker } = require('tesseract.js');
+  const worker = createWorker();
+  await worker.load();
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+  const {
+    data: { text },
+  } = await worker.recognize(buffer);
+  await worker.terminate();
+  return text;
+}
+
+export async function readDecISR(buffer: Buffer) {
+  const { createWorker } = require('tesseract.js');
+  const worker = createWorker();
+  await worker.load();
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+  const {
+    data: { text },
+  } = await worker.recognize(buffer);
+  await worker.terminate();
+  return text;
+}
+
+export async function readPagoIMSS(buffer: Buffer) {
+  const { createWorker } = require('tesseract.js');
+  const worker = createWorker();
+  await worker.load();
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+  const {
+    data: { text },
+  } = await worker.recognize(buffer);
+  await worker.terminate();
+  return text;
+}
+
+export async function readPagoISR(buffer: Buffer) {
+  const { createWorker } = require('tesseract.js');
+  const worker = createWorker();
+  await worker.load();
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+  const {
+    data: { text },
+  } = await worker.recognize(buffer);
+  await worker.terminate();
+  return text;
 }

@@ -1,4 +1,9 @@
+import { Bad_Script } from 'next/font/google';
 import { Revenue } from './definitions';
+import { fromBuffer } from 'pdf2pic';
+import { pdf } from 'pdf-to-img';
+import { pdfToPng } from 'pdf-to-png-converter';
+import fs from 'fs';
 
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
@@ -66,4 +71,29 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     '...',
     totalPages,
   ];
+};
+export const pdfToIMG = async (buffer: Buffer) => {
+  console.log(Buffer.byteLength(buffer));
+  let counter = 1;
+  const document = await pdf(buffer, { scale: 3 });
+  for await (const image of document) {
+    fs.writeFileSync(`d.png`, image);
+    counter++;
+  }
+};
+export const classifyText = (text: string): number => {
+  if (text.includes('FEDERALES')) {
+    if (text.includes('SAT') && text.includes('ACUSE')) {
+      return 2;
+    } else if (text.includes('PAGO')) {
+      return 4;
+    }
+    return 0;
+    //SIPARE|IMSS|CUOTAS|INFONAVIT|LIQUIDACIÓN|LIQUIDACION|OBRERO
+  } else if (text.includes('CUOTAS') && text.includes('PAGO')) {
+    return 1;
+  } else if (text.includes('SIPARE')) {
+    return 3;
+  }
+  return 0;
 };

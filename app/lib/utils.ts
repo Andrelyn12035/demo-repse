@@ -1,8 +1,4 @@
-import { Bad_Script } from 'next/font/google';
 import { Revenue } from './definitions';
-import { fromBuffer } from 'pdf2pic';
-import { pdf } from 'pdf-to-img';
-import { pdfToPng } from 'pdf-to-png-converter';
 import fs from 'fs';
 
 export const formatCurrency = (amount: number) => {
@@ -72,28 +68,50 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
-export const pdfToIMG = async (buffer: Buffer) => {
+export const pdfToIMG = async (buffer: Buffer): Promise<string> => {
   console.log(Buffer.byteLength(buffer));
-  let counter = 1;
-  const document = await pdf(buffer, { scale: 3 });
-  for await (const image of document) {
-    fs.writeFileSync(`d.png`, image);
-    counter++;
-  }
+  let respone = await fetch('http://localhost:8000/pdf2image', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ file: buffer.toString('base64') }),
+  });
+  return respone.text();
 };
+
 export const classifyText = (text: string): number => {
   if (text.includes('FEDERALES')) {
-    if (text.includes('SAT') && text.includes('ACUSE')) {
+    if (text.includes('ACUSE')) {
       return 2;
     } else if (text.includes('PAGO')) {
       return 4;
     }
     return 0;
-    //SIPARE|IMSS|CUOTAS|INFONAVIT|LIQUIDACIÓN|LIQUIDACION|OBRERO
   } else if (text.includes('CUOTAS') && text.includes('PAGO')) {
     return 1;
   } else if (text.includes('SIPARE')) {
     return 3;
   }
   return 0;
+};
+
+export const getCurrDate = (): string => {
+  const currentDate = new Date();
+
+  // Get the current date components
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1; // Months are zero-indexed, so add 1
+  const day = currentDate.getDate();
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+  const seconds = currentDate.getSeconds();
+
+  // Format the date as needed, for example, YYYY-MM-DD HH:MM:SS
+  const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day
+    .toString()
+    .padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes
+    .toString()
+    .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  return formattedDate;
 };

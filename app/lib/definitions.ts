@@ -113,8 +113,6 @@ export type pagoIMSS = {
   fechaPago: string;
   archivo: string;
   fechaProcesamiento: string;
-  remitente: string;
-  asunto: string;
 };
 
 export type pagoISR = {
@@ -127,8 +125,6 @@ export type pagoISR = {
   nombreSolicitante: string;
   nombreArchivo: string;
   fechaProcesamiento: string;
-  remitente: string;
-  asunto: string;
 };
 
 export type declaracionISR = {
@@ -149,8 +145,6 @@ export type declaracionISR = {
   tipoDeclaracion: string;
   numOperacion: string;
   fechaProcesamiento: string;
-  remitente: string;
-  asunto: string;
 };
 
 export type declaracionIMSS = {
@@ -158,7 +152,7 @@ export type declaracionIMSS = {
   titulo: string;
   lineaCaptura: string;
   fechaPago: string;
-  periodoPago: string;
+  periodo: string;
   razonSocial: string;
   registroPatronal: string;
   rfc: string;
@@ -166,8 +160,6 @@ export type declaracionIMSS = {
   total: string;
   archivo: string;
   fechaProcesamiento: string;
-  remitente: string;
-  asunto: string;
   ejercicio: string;
 };
 

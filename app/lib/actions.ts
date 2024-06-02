@@ -10,8 +10,6 @@ import {
 } from './data';
 import { classifyText, pdfToIMG } from './utils';
 import { createWorker } from 'tesseract.js';
-import { OpenAI, ClientOptions } from 'openai';
-import fs from 'fs';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY as string;
 export async function authenticate(
@@ -60,41 +58,43 @@ export async function uploadFiles(formData: FormData) {
       let buffer = Buffer.from(await file.arrayBuffer());
       const fileType = '.' + file.type.split('/')[1];
       const outputFileName = `yourfilenamehere${i}${fileType}`;
+      let imgBuffer = buffer;
       if (fileType === '.pdf') {
-        pdfToIMG(buffer); /*
-        console.log('PDF converted to image.', Buffer.byteLength(buffer));
+        const base64Str = await pdfToIMG(buffer);
+        imgBuffer = Buffer.from(base64Str, 'base64');
       }
-      fs.writeFileSync(`hola.png`, buffer);
-      (async () => {
-        const worker = await createWorker('spa', 1, {
-          workerPath:
-            './node_modules/tesseract.js/src/worker-script/node/index.js',
-        });
-        const {
-          data: { text },
-        } = await worker.recognize(buffer);
-        console.log('Text:', text.toUpperCase());
-        const type = classifyText(text.toUpperCase());
-        console.log('Type:', type);
-        switch (type) {
-          case 1:
-            break;
-          case 2:
-            break;
-          case 3:
-            break;
-          case 4:
-            break;
-          default:
-            break;
-        }
-        await worker.terminate();
-      })();*/
+      const worker = await createWorker('spa', 1, {
+        workerPath:
+          './node_modules/tesseract.js/src/worker-script/node/index.js',
+      });
+      const {
+        data: { text },
+      } = await worker.recognize(imgBuffer);
+      console.log('Text:', text.toUpperCase());
+      const type = classifyText(text.toUpperCase());
+      console.log('Type:', type);
+      switch (type) {
+        case 1:
+          readDecIMSS(imgBuffer, file.name);
+          break;
+        case 2:
+          readDecISR(imgBuffer, file.name);
+          break;
+        case 3:
+          readPagoIMSS(imgBuffer, file.name);
+          break;
+        case 4:
+          readPagoISR(imgBuffer, file.name);
+          break;
+        default:
+          break;
       }
-      i++;
+      await worker.terminate();
     }
+    i++;
   }
 }
+
 /*
 Declaracion imss = 1
 declaracion isr = 2
@@ -102,7 +102,3 @@ pago imss = 3
 pago isr = 4
 error = 0
 */
-
-export async function uploadFile(file: File) {
-  console.log('File name:', file.name);
-}

@@ -21,8 +21,9 @@ export default async function InvoicesTable({
     if (session?.user?.image === '1' || session?.user?.image === '2') {
       rows = await fetchDeclaracionesIMSS();
     } else {
-      rows = await fetchFilteredDeclaracionesIMSS(session.user.image || '');
+      rows = await fetchFilteredDeclaracionesIMSS(session.user.name || '');
     }
+    console.log('rows: ' + JSON.stringify(rows));
   }
 
   /* currentPage*/
@@ -41,7 +42,7 @@ export default async function InvoicesTable({
                     <div className="mb-2 flex items-center">
                       <p>{document.ejercicio}</p>
                     </div>
-                    <p className="text-sm text-gray-500">{document.periodo}</p>
+                    <p className="text-sm text-gray-500">{document.periodoPago}</p>
                   </div>
                   {/*<InvoiceStatus status={document.} />*/}
                 </div>
@@ -88,7 +89,7 @@ export default async function InvoicesTable({
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {document.periodo}
+                    {document.periodoPago}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {document.lineaCaptura}

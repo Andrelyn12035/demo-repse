@@ -10,7 +10,7 @@ class File(BaseModel):
     file: str
 
 app = FastAPI()
-
+ #uvicorn main:app --reload
 
 def pdf_to_png(pdf_path):
     # Convert PDF to a list of images (one image per page)
@@ -35,7 +35,7 @@ def root():
 @app.post("/pdf2image")
 def pdf2image(req: File) -> str:
     bytes = base64.b64decode(req.file)
-    images = convert_from_bytes(bytes)
+    images = convert_from_bytes(bytes, poppler_path="C:/Users/Andres Ramirez/Downloads/Release-24.02.0-0/poppler-24.02.0/Library/bin")
     #images[0].save("dds.png", format="PNG")
     base64_string = ''
     # Assuming you want to convert the first page

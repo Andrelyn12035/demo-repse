@@ -77,7 +77,7 @@ export default function Form() {
         </fieldset>
       </div>
       <div className="mt-6 flex justify-end gap-4">
-        <Button type="submit">Create usuario</Button>
+        <Button type="submit">Crear usuario</Button>
       </div>
     </form>
   );

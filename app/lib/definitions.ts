@@ -150,7 +150,7 @@ export type declaracionIMSS = {
   titulo: string;
   lineaCaptura: string;
   fechaPago: string;
-  periodo: string;
+  periodoPago: string;
   razonSocial: string;
   registroPatronal: string;
   rfc: string;

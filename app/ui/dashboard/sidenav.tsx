@@ -5,9 +5,13 @@ import { PowerIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 
 export default async function SideNav() {
-  const session = await auth()
-  if (session?.user ) {
-    console.log("session user aja: "+JSON.stringify(session.user));
+  const session = await auth();
+  let role = false;
+  if (session?.user) {
+    console.log('session: ' + JSON.stringify(session.user));
+    if (session?.user?.image === '1' || session?.user?.image === '2') {
+      role = true;
+    }
   }
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
@@ -20,7 +24,7 @@ export default async function SideNav() {
         </div>
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-        <NavLinks />
+        <NavLinks role={role} />
         <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
         <form
           action={async () => {

@@ -1,7 +1,7 @@
 import { sql } from '@vercel/postgres';
 import {
   CustomerField,
-  CustomersTableType,
+  ProveedoresTableType,
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
@@ -17,6 +17,7 @@ import {
   declaracionISR,
   pagoIMSS,
   pagoISR,
+  UserData,
 } from './definitions'; // for types
 import { db } from './db';
 import { RowDataPacket } from 'mysql2';
@@ -112,7 +113,7 @@ export async function fetchFilteredDeclaracionesIMSS(query: string) {
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
+    throw new Error('Failed to fetch filtered DeclaracionesIMSS.');
   }
 }
 export async function fetchDeclaracionesIMSS() {
@@ -191,7 +192,7 @@ export async function fetchCustomers() {
 
 export async function fetchFilteredCustomers(query: string) {
   try {
-    const data = await sql<CustomersTableType>`
+    const data = await sql`
 		SELECT
 		  customers.id,
 		  customers.name,
@@ -480,5 +481,32 @@ export async function readPagoISR(buffer: Buffer, filename: string) {
       console.log('Error al insertar en la base de datos pagoIMSS');
       return error;
     }
+  }
+}
+
+export async function fetchUsers() {
+  try {
+    const [rows, fields] = await db.execute<RowDataPacket[]>(
+      'SELECT id,name,rfc,role FROM users WHERE role=3',
+    );
+    console.log('data', rows);
+    return rows;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all customers.');
+  }
+}
+
+export async function writeUser(user: UserData) {
+  try {
+    const [result] = await db.execute(
+      'INSERT INTO users (name, rfc, password, role) VALUES (? ,? ,? ,?)',
+      [user.name, user.rfc, user.password, 3],
+    );
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+    console.log('Error al insertar en la base de datos pagoIMSS');
+    return error;
   }
 }

@@ -8,8 +8,10 @@ import {
   readPagoIMSS,
   readPagoISR,
 } from './data';
+import { writeUser } from './data';
 import { classifyText, pdfToIMG } from './utils';
 import { createWorker } from 'tesseract.js';
+import { UserData } from './definitions';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY as string;
 export async function authenticate(
@@ -95,6 +97,25 @@ export async function uploadFiles(formData: FormData) {
   }
 }
 
+export async function createUser(formData: FormData) {
+  try {
+    const rs = formData.get('Rs') as string;
+    const rfc = formData.get('rfc') as string;
+    const password = formData.get('password') as string;
+    const user = { name: rs, rfc: rfc, password: password } as UserData;
+    await writeUser(user);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
+}
 /*
 Declaracion imss = 1
 declaracion isr = 2

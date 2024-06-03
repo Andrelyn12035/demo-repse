@@ -7,20 +7,50 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { fetchUsers } from '@/app/lib/data';
+import { ProveedoresTableType } from '@/app/lib/definitions';
+import { link } from 'fs';
+
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
-const links = [
+let links = [
   { name: 'Home', href: '/dashboard', icon: HomeIcon },
   {
     name: 'Invoices',
     href: '/dashboard/invoices',
     icon: DocumentDuplicateIcon,
   },
-  { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  { name: 'Proveedores', href: '/dashboard/proveedores', icon: UserGroupIcon },
 ];
 
-export default function NavLinks() {
+export default function NavLinks({ role }: { role: boolean }) {
   const pathname = usePathname();
+  console.log('role: ' + role);
+
+  if (!role) {
+    links = [
+      { name: 'Home', href: '/dashboard', icon: HomeIcon },
+      {
+        name: 'Invoices',
+        href: '/dashboard/invoices',
+        icon: DocumentDuplicateIcon,
+      },
+    ];
+  } else {
+    links = [
+      { name: 'Home', href: '/dashboard', icon: HomeIcon },
+      {
+        name: 'Invoices',
+        href: '/dashboard/invoices',
+        icon: DocumentDuplicateIcon,
+      },
+      {
+        name: 'Proveedores',
+        href: '/dashboard/proveedores',
+        icon: UserGroupIcon,
+      },
+    ];
+  }
   return (
     <>
       {links.map((link) => {

@@ -12,7 +12,11 @@ export type User = {
   password: string;
   role: string;
 };
-
+export type UserData = {
+  name: string;
+  rfc: string;
+  password: string;
+};
 export type User2 = {
   name: string;
   email: string;
@@ -65,24 +69,18 @@ export type InvoicesTable = {
   status: 'pending' | 'paid';
 };
 
-export type CustomersTableType = {
+export type ProveedoresTableType = {
   id: string;
   name: string;
-  email: string;
-  image_url: string;
-  total_invoices: number;
-  total_pending: number;
-  total_paid: number;
+  rfc: string;
+  role: string;
 };
 
-export type FormattedCustomersTable = {
+export type FormattedProveedoresTable = {
   id: string;
   name: string;
-  email: string;
-  image_url: string;
-  total_invoices: number;
-  total_pending: string;
-  total_paid: string;
+  rfc: string;
+  role: string;
 };
 
 export type CustomerField = {

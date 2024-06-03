@@ -41,9 +41,7 @@ export default async function InvoicesTable({
                     <div className="mb-2 flex items-center">
                       <p>{document.ejercicio}</p>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      {document.periodoPago}
-                    </p>
+                    <p className="text-sm text-gray-500">{document.periodo}</p>
                   </div>
                   {/*<InvoiceStatus status={document.} />*/}
                 </div>
@@ -81,7 +79,7 @@ export default async function InvoicesTable({
             <tbody className="bg-white">
               {rows?.map((document) => (
                 <tr
-                  key={document.ejercicio}
+                  key={document.id}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                 >
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
@@ -90,7 +88,7 @@ export default async function InvoicesTable({
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {document.periodoPago}
+                    {document.periodo}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {document.lineaCaptura}

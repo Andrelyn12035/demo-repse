@@ -296,7 +296,7 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
           json.titulo,
           json.lineaCaptura,
           json.fechaPago,
-          json.periodo,
+          json.periodoPago,
           json.razonSocial,
           json.registroPatronal,
           json.rfc,

@@ -3,6 +3,7 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
+  FolderOpenIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,13 +15,6 @@ import { link } from 'fs';
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
 let links = [
-  { name: 'Home', href: '/dashboard', icon: HomeIcon },
-  {
-    name: 'Invoices',
-    href: '/dashboard/invoices',
-    icon: DocumentDuplicateIcon,
-  },
-  { name: 'Proveedores', href: '/dashboard/proveedores', icon: UserGroupIcon },
 ];
 
 export default function NavLinks({ role }: { role: boolean }) {
@@ -31,8 +25,8 @@ export default function NavLinks({ role }: { role: boolean }) {
     links = [
       { name: 'Home', href: '/dashboard', icon: HomeIcon },
       {
-        name: 'Invoices',
-        href: '/dashboard/invoices',
+        name: 'Documentos',
+        href: '/dashboard/documents',
         icon: DocumentDuplicateIcon,
       },
     ];
@@ -40,8 +34,8 @@ export default function NavLinks({ role }: { role: boolean }) {
     links = [
       { name: 'Home', href: '/dashboard', icon: HomeIcon },
       {
-        name: 'Invoices',
-        href: '/dashboard/invoices',
+        name: 'Documentos',
+        href: '/dashboard/documents',
         icon: DocumentDuplicateIcon,
       },
       {

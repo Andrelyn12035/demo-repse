@@ -17,13 +17,11 @@ export default async function InvoicesTable({
   let rows: declaracionIMSS[] = [];
   const session = await auth();
   if (session?.user) {
-    console.log('session user aja: ' + JSON.stringify(session.user));
     if (session?.user?.image === '1' || session?.user?.image === '2') {
       rows = await fetchDeclaracionesIMSS();
     } else {
       rows = await fetchFilteredDeclaracionesIMSS(session.user.name || '');
     }
-    console.log('rows: ' + JSON.stringify(rows));
   }
 
   /* currentPage*/

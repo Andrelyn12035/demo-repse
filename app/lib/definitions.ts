@@ -168,3 +168,8 @@ export interface File {
   extension: string;
   content: ArrayBuffer;
 }
+
+export interface periodo{
+  name: string;
+  tipo: string;
+}

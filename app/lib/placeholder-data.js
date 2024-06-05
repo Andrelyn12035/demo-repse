@@ -180,9 +180,33 @@ const revenue = [
   { month: 'Dec', revenue: 4800 },
 ];
 
+const meses = [
+  { name: 'ENERO', tipo:'mes' },
+  { name: 'FEBRERO', tipo:'mes' },
+  { name: 'MARZO', tipo:'mes' },
+  { name: 'ABRIL', tipo:'mes' },
+  { name: 'MAYO', tipo:'mes' },
+  { name: 'JUNIO', tipo:'mes' },
+  { name: 'JULIO', tipo:'mes' },
+  { name: 'AGOSTO', tipo:'mes' },
+  { name: 'SEPTIEMBRE', tipo:'mes' },
+  { name: 'OCTUBRE', tipo:'mes' },
+  { name: 'NOVIEMBRE', tipo:'mes' },
+  { name: 'DICIEMBRE', tipo:'mes' }
+];
+
+const años = [
+  { name: '2021', tipo:'año' },
+  { name: '2022', tipo:'año' },
+  { name: '2023', tipo:'año' },
+  { name: '2024', tipo:'año' }
+];
+
 module.exports = {
   users,
   customers,
   invoices,
   revenue,
+  meses,
+  años
 };

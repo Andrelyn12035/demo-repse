@@ -7,6 +7,7 @@ import {
   readDecISR,
   readPagoIMSS,
   readPagoISR,
+  writeNewFile
 } from './data';
 import { writeUser } from './data';
 import { classifyText, pdfToIMG } from './utils';
@@ -54,6 +55,7 @@ export async function getDecIMSS() {
 export async function uploadFiles(formData: FormData) {
   const files = formData.getAll('files');
   console.log('Files:', files);
+  const path = formData.get('path');
   let i = 0;
   for (const file of files) {
     if (file instanceof File) {
@@ -61,6 +63,7 @@ export async function uploadFiles(formData: FormData) {
       const fileType = '.' + file.type.split('/')[1];
       const outputFileName = `yourfilenamehere${i}${fileType}`;
       let imgBuffer = buffer;
+      writeNewFile(path as string, file.name);
       if (fileType === '.pdf') {
         const base64Str = await pdfToIMG(buffer);
         imgBuffer = Buffer.from(base64Str, 'base64');
@@ -116,6 +119,7 @@ export async function createUser(formData: FormData) {
     throw error;
   }
 }
+
 /*
 Declaracion imss = 1
 declaracion isr = 2

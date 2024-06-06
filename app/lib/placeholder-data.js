@@ -181,25 +181,25 @@ const revenue = [
 ];
 
 const meses = [
-  { name: 'ENERO', tipo:'mes' },
-  { name: 'FEBRERO', tipo:'mes' },
-  { name: 'MARZO', tipo:'mes' },
-  { name: 'ABRIL', tipo:'mes' },
-  { name: 'MAYO', tipo:'mes' },
-  { name: 'JUNIO', tipo:'mes' },
-  { name: 'JULIO', tipo:'mes' },
-  { name: 'AGOSTO', tipo:'mes' },
-  { name: 'SEPTIEMBRE', tipo:'mes' },
-  { name: 'OCTUBRE', tipo:'mes' },
-  { name: 'NOVIEMBRE', tipo:'mes' },
-  { name: 'DICIEMBRE', tipo:'mes' }
+  { name: 'ENERO', path:'ENERO' },
+  { name: 'FEBRERO', path:'FEBRERO' },
+  { name: 'MARZO', path:'MARZO' },
+  { name: 'ABRIL', path:'ABRIL' },
+  { name: 'MAYO', path:'MAYO' },
+  { name: 'JUNIO', path:'JUNIO' },
+  { name: 'JULIO', path:'JULIO' },
+  { name: 'AGOSTO', path:'AGOSTO' },
+  { name: 'SEPTIEMBRE', path:'SEPTIEMBRE' },
+  { name: 'OCTUBRE', path:'OCTUBRE' },
+  { name: 'NOVIEMBRE', path:'NOVIEMBRE' },
+  { name: 'DICIEMBRE', path:'DICIEMBRE' }
 ];
 
 const años = [
-  { name: '2021', tipo:'año' },
-  { name: '2022', tipo:'año' },
-  { name: '2023', tipo:'año' },
-  { name: '2024', tipo:'año' }
+  { name: '2021', path:'/dashboard/documents/2021' },
+  { name: '2022', path:'/dashboard/documents/2022' },
+  { name: '2023', path:'/dashboard/documents/2023' },
+  { name: '2024', path:'/dashboard/documents/2024' }
 ];
 
 module.exports = {

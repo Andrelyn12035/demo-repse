@@ -9,7 +9,7 @@ import {
   Revenue,
 } from './definitions';
 import { OpenAI, ClientOptions } from 'openai';
-
+import { auth } from '@/auth';
 import { revenue, invoices, users, customers } from './placeholder-data';
 import { formatCurrency, getCurrDate } from './utils';
 import {
@@ -22,6 +22,7 @@ import {
 import { db } from './db';
 import { RowDataPacket } from 'mysql2';
 import { get } from 'http';
+import exp from 'constants';
 
 export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
@@ -508,5 +509,49 @@ export async function writeUser(user: UserData) {
     console.log(error);
     console.log('Error al insertar en la base de datos pagoIMSS');
     return error;
+  }
+}
+/*
+path
+name
+id_user
+*/
+export async function writeNewFile(path: string, name: string) {
+  try {
+    const session = await auth();
+    if (session?.user?.name) {
+      const id_user = session?.user?.name;
+      console.log("params", path, name, id_user)
+      const [result, fields] = await db.execute(
+      'INSERT INTO files (path, name, id_user) VALUES (? ,? ,?)',
+      [path, 
+      name, 
+      id_user],
+      );
+      return result;
+    }
+    
+  } catch (error) {
+    console.log(error);
+    console.log('Error al insertar en la base de datos pagoIMSS');
+    return error;
+  }
+}
+
+export async function fetchFiles(path: string) {
+  try {
+    console.log(path)
+    const session = await auth();
+    if (session?.user?.name) {
+      const [rows, fields] = await db.execute<RowDataPacket[]>(
+        'SELECT * FROM files WHERE id_user = ? and path = ?',
+        [session.user.name, path],
+      );
+      return rows;
+    }
+    
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all files');
   }
 }

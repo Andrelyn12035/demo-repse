@@ -1,9 +1,8 @@
 import InvoicesTable from '@/app/ui/dashboard/table';
 import { lusitana } from '@/app/ui/fonts';
-import { fetchRevenue, fetchLatestInvoices, getPagoIMSS } from '@/app/lib/data';
-import { useSession } from 'next-auth/react';
-import { authenticate, getDecIMSS } from '@/app/lib/actions';
+import { getDecIMSS} from '@/app/lib/actions';
 import {auth} from '@/auth';
+import { Button } from '../ui/button';
 
 export default async function Page({
   searchParams,
@@ -20,7 +19,6 @@ export default async function Page({
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
   //const totalPages = await fetchInvoicesPages(query);
-  const rows = getDecIMSS();
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>

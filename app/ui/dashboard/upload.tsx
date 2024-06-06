@@ -1,13 +1,22 @@
 'use client';
+import {
+  DocumentPlusIcon
+} from '@heroicons/react/24/outline';
 import * as React from 'react';
 import { useState } from 'react';
 import { uploadFiles } from '@/app/lib/actions';
-
-export const Upload = () => {
+import  Modal  from '@/app/ui/documents/modal';
+import { Button } from '@/app/ui/button';
+import { usePathname } from 'next/navigation';
+export const Upload = (
+) => {
   const [files, setFiles] = useState<FileList | null>(null);
   const [status, setStatus] = useState<
     'initial' | 'uploading' | 'success' | 'fail'
   >('initial');
+  const pathname = usePathname();
+  const [showModal, setShowModal] = useState<boolean>(false);
+    
   const [input, setInput] = useState<HTMLInputElement>();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -16,7 +25,9 @@ export const Upload = () => {
       setInput(e.target);
     }
   };
-
+  function toggleModal() {
+    setShowModal(!showModal);
+  }
   const handleUpload = async () => {
     if (files) {
       setStatus('uploading');
@@ -26,7 +37,7 @@ export const Upload = () => {
       [...files].forEach((file) => {
         formData.append('files', file);
       });
-
+      formData.append('path', pathname);
       try {
         uploadFiles(formData);
       } catch (error) {
@@ -43,9 +54,14 @@ export const Upload = () => {
     }
   };
   return (
-    <div
+    <>
+    <div className='w-full flex justify-end'>
+            <Button className='hover:bg-gray-300' onClick={toggleModal}><DocumentPlusIcon className="h-6 w-6"/></Button>
+    </div>
+        <Modal open={showModal} onClose={toggleModal}>
+            <div
       id="FileUpload-container"
-      className="mb-5.5 border-primary sm:py-7.5 relative flex w-3/12 cursor-pointer appearance-none flex-col gap-4 rounded border border-dashed px-4 py-4 text-sm"
+      className="mb-5.5 w-full border-primary sm:py-7.5 relative flex w-3/12 cursor-pointer appearance-none flex-col gap-4 rounded border border-dashed px-4 py-4 text-sm"
     >
       <div
         id="FileUpload"
@@ -124,6 +140,9 @@ export const Upload = () => {
           </>
         )}
       </div>
-    </div>
+            </div>
+        </Modal>
+    
+    </>
   );
 };

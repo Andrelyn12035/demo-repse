@@ -171,5 +171,17 @@ export interface File {
 
 export interface periodo{
   name: string;
-  tipo: string;
+  path: string;
+}
+
+export interface fileInfo{
+  name: string;
+  link: string;
+}
+
+export interface fileData{
+  id: string;
+  path: string;
+  name: string;
+  id_user: string;
 }

@@ -181,25 +181,39 @@ const revenue = [
 ];
 
 const meses = [
-  { name: 'ENERO', path:'ENERO' },
-  { name: 'FEBRERO', path:'FEBRERO' },
-  { name: 'MARZO', path:'MARZO' },
-  { name: 'ABRIL', path:'ABRIL' },
-  { name: 'MAYO', path:'MAYO' },
-  { name: 'JUNIO', path:'JUNIO' },
-  { name: 'JULIO', path:'JULIO' },
-  { name: 'AGOSTO', path:'AGOSTO' },
-  { name: 'SEPTIEMBRE', path:'SEPTIEMBRE' },
-  { name: 'OCTUBRE', path:'OCTUBRE' },
-  { name: 'NOVIEMBRE', path:'NOVIEMBRE' },
-  { name: 'DICIEMBRE', path:'DICIEMBRE' }
+  { name: 'ENERO', path: 'ENERO' },
+  { name: 'FEBRERO', path: 'FEBRERO' },
+  { name: 'MARZO', path: 'MARZO' },
+  { name: 'ABRIL', path: 'ABRIL' },
+  { name: 'MAYO', path: 'MAYO' },
+  { name: 'JUNIO', path: 'JUNIO' },
+  { name: 'JULIO', path: 'JULIO' },
+  { name: 'AGOSTO', path: 'AGOSTO' },
+  { name: 'SEPTIEMBRE', path: 'SEPTIEMBRE' },
+  { name: 'OCTUBRE', path: 'OCTUBRE' },
+  { name: 'NOVIEMBRE', path: 'NOVIEMBRE' },
+  { name: 'DICIEMBRE', path: 'DICIEMBRE' }
 ];
 
 const años = [
-  { name: '2021', path:'/dashboard/documents/2021' },
-  { name: '2022', path:'/dashboard/documents/2022' },
-  { name: '2023', path:'/dashboard/documents/2023' },
-  { name: '2024', path:'/dashboard/documents/2024' }
+  { name: '2021', path: '/dashboard/documents/2021' },
+  { name: '2022', path: '/dashboard/documents/2022' },
+  { name: '2023', path: '/dashboard/documents/2023' },
+  { name: '2024', path: '/dashboard/documents/2024' }
+];
+
+const tipos = [
+  { name: 'Declaracion IMSS', path: 'Decimss' },
+  { name: 'Declaracion ISR', path: 'Decisr' },
+  { name: 'Pago IMSS', path: 'Paimss' },
+  { name: 'Pago ISR', path: 'Paisr' }
+];
+
+const proveedores = [
+  { name: 'Hazlo posible', path: 'HPM' },
+  { name: 'No lo hagas', path: 'HNM' },
+  { name: 'Aja', path: 'AKD' },
+  { name: 'Aja 2', path: 'DMSDSM' }
 ];
 
 module.exports = {
@@ -208,5 +222,7 @@ module.exports = {
   invoices,
   revenue,
   meses,
-  años
+  años,
+  tipos,
+  proveedores
 };

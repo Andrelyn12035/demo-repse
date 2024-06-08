@@ -1,3 +1,4 @@
+'use server';
 import { sql } from '@vercel/postgres';
 import {
   CustomerField,
@@ -7,6 +8,7 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
+  fileData,
 } from './definitions';
 import { OpenAI, ClientOptions } from 'openai';
 import { auth } from '@/auth';
@@ -387,7 +389,7 @@ export async function readPagoIMSS(buffer: Buffer, filename: string) {
         content: [
           {
             type: 'text',
-            text: "from the provided image, extract data for each of the example JSON fields between. In the JSON output, replace [data] with each field's extracted data text using only string datatypes. Use a string value of 'N/A' when the field's data text is not found in the provided image. Convert all numbers to a standard 2-place decimal notation. Convert all dates to international format 'yyyy-mm-dd'. For example, dates in the document text may start as something like 18.05.2024 or 3/21/2025, and need to be converted to 2024-05-18 & 2025-03-21 respectively. Some special instructions are: 'titulo' is the title of the document and it usually contains the words 'Pago' and-or ' sipare' and-or 'cuotas', 'banco' is one word from the following list [BANAMEX, BBVA, AFIRME, BANBAJIO, BANRE, INBURSA, BANORTE, HSBC, SANTANDER, SCOTIABANK],'periodo' could be a month-year format or a yyyymm format but the final data shoud be the month in spanish and 'ejercicio' is the year of that date, remove all dashes and white spaces in 'lineaCaptura' it should have 53 letters and numbers, all fields must be in upper case and keep their original language. This is an example JSON: {'folioSUA': '[data]',  'periodo': '[data]',  'ejercicio': '[data]',  'lineaCaptura': '[data]',  'registroPatronal': '[data]',  'importeIMSS': '[data]',  'importeRCV': '[data]',  'importeVIV': '[data]',  'importeACV': '[data]',  'totalAPagar': '[data]',  'banco': '[data]', 'fechaPago': '[data]'}. Return only the final JSON object. Do not return any other output descriptions or explanations, only the JSON object and make sure is a valid one. No notes. Forget about '```json' and '```' delimiters in the output. Make sure property names are in double quotes.",
+            text: "from the provided image, extract data for each of the example JSON fields between. In the JSON output, replace [data] with each field's extracted data text using only string datatypes. Use a string value of 'N/A' when the field's data text is not found in the provided image. Convert all numbers to a standard 2-place decimal notation. Convert all dates to international format 'yyyy-mm-dd'. For example, dates in the document text may start as something like 18.05.2024 or 3/21/2025, and need to be converted to 2024-05-18 & 2025-03-21 respectively. Some special instructions are: 'titulo' is the title of the document and it usually contains the words 'Pago' and-or ' sipare' and-or 'cuotas', 'banco' is one word from the following list [BANAMEX, BBVA, AFIRME, BANBAJIO, BANRE, INBURSA, BANORTE, HSBC, SANTANDER, SCOTIABANK],'periodo' could be a month-year format or a yyyymm format but the final data shoud be the month in spanish and 'ejercicio' is the year of that date, remove all dashes and white spaces in 'lineaCaptura' it should have 53 letters and numbers, all fields must be in upper case and keep their original language, 'titulo is the title of the document'. This is an example JSON: {'folioSUA': '[data]',  'periodo': '[data]',  'ejercicio': '[data]',  'lineaCaptura': '[data]',  'registroPatronal': '[data]',  'importeIMSS': '[data]',  'importeRCV': '[data]',  'importeVIV': '[data]',  'importeACV': '[data]',  'totalAPagar': '[data]',  'banco': '[data]', 'fechaPago': '[data]', 'titulo': '[titulo]'}. Return only the final JSON object. Do not return any other output descriptions or explanations, only the JSON object and make sure is a valid one. No notes. Forget about '```json' and '```' delimiters in the output. Make sure property names are in double quotes.",
           },
           {
             type: 'image_url',
@@ -399,33 +401,36 @@ export async function readPagoIMSS(buffer: Buffer, filename: string) {
     max_tokens: 4096,
   });
   const json_string = response.choices[0].message.content;
-  console.log(json_string);
   if (json_string) {
     const json = JSON.parse(json_string) as pagoIMSS;
-    console.log(json);
+
     try {
-      const [result] = await db.execute(
-        'INSERT INTO pagoimss (folioSUA, titulo, periodo, ejercicio, lineaCaptura, registroPatronal, importeIMSS, importeRCV, importeVIV, importeACV, totalAPagar, banco, fechaPago, archivo, fechaProcesamiento, id_user) VALUES (?,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?)',
-        [
-          json.folioSUA,
-          json.titulo,
-          json.periodo,
-          json.ejercicio,
-          json.lineaCaptura,
-          json.registroPatronal,
-          json.importeIMSS,
-          json.importeRCV,
-          json.importeVIV,
-          json.importeACV,
-          json.totalAPagar,
-          json.banco,
-          json.fechaPago,
-          filename,
-          getCurrDate(),
-          3,
-        ],
-      );
-      console.log(result);
+      const session = await auth();
+      if (session?.user?.name) {
+        const [result] = await db.execute(
+          'INSERT INTO pagoimss (folioSUA, titulo, periodo, ejercicio, lineaCaptura, registroPatronal, importeIMSS, importeRCV, importeVIV, importeACV, totalAPagar, banco, fechaPago, archivo, fechaProcesamiento, id_user) VALUES (?, ? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?)',
+          [
+            json.folioSUA,
+            json.titulo,
+            json.periodo,
+            json.ejercicio,
+            json.lineaCaptura,
+            json.registroPatronal,
+            json.importeIMSS,
+            json.importeRCV,
+            json.importeVIV,
+            json.importeACV,
+            json.totalAPagar,
+            json.banco,
+            json.fechaPago,
+            filename,
+            getCurrDate(),
+            session.user.name,
+          ],
+        );
+
+        console.log(result);
+      }
     } catch (error) {
       console.log(error);
       console.log('Error al insertar en la base de datos pagoIMSS');
@@ -462,21 +467,24 @@ export async function readPagoISR(buffer: Buffer, filename: string) {
     const json = JSON.parse(json_string) as pagoISR;
     console.log(json);
     try {
-      const [result] = await db.execute(
-        'INSERT INTO pagoisr (titulo, lineaCaptura, fechaPago, totalAPagar, banco, nombreSolicitante, nombreArchivo, fechaProcesamiento, id_user) VALUES (?,? ,? ,? ,? ,? ,? ,? ,?)',
-        [
-          json.titulo,
-          json.lineaCaptura,
-          json.fechaPago,
-          json.totalAPagar,
-          json.banco,
-          json.nombreSolicitante,
-          filename,
-          getCurrDate(),
-          3,
-        ],
-      );
-      console.log(result);
+      const session = await auth();
+      if (session?.user?.name) {
+        const [result] = await db.execute(
+          'INSERT INTO pagoisr (titulo, lineaCaptura, fechaPago, totalAPagar, banco, nombreSolicitante, nombreArchivo, fechaProcesamiento, id_user) VALUES (?,? ,? ,? ,? ,? ,? ,? ,?)',
+          [
+            json.titulo,
+            json.lineaCaptura,
+            json.fechaPago,
+            json.totalAPagar,
+            json.banco,
+            json.nombreSolicitante,
+            filename,
+            getCurrDate(),
+            session?.user?.name,
+          ],
+        );
+        console.log(result);
+      }
     } catch (error) {
       console.log(error);
       console.log('Error al insertar en la base de datos pagoIMSS');
@@ -521,16 +529,13 @@ export async function writeNewFile(path: string, name: string) {
     const session = await auth();
     if (session?.user?.name) {
       const id_user = session?.user?.name;
-      console.log("params", path, name, id_user)
+      console.log('params', path, name, id_user);
       const [result, fields] = await db.execute(
-      'INSERT INTO files (path, name, id_user) VALUES (? ,? ,?)',
-      [path, 
-      name, 
-      id_user],
+        'INSERT INTO files (path, name, id_user) VALUES (? ,? ,?)',
+        [path, name, id_user],
       );
       return result;
     }
-    
   } catch (error) {
     console.log(error);
     console.log('Error al insertar en la base de datos pagoIMSS');
@@ -540,16 +545,15 @@ export async function writeNewFile(path: string, name: string) {
 
 export async function fetchFiles(path: string) {
   try {
-    console.log(path)
     const session = await auth();
     if (session?.user?.name) {
       const [rows, fields] = await db.execute<RowDataPacket[]>(
         'SELECT * FROM files WHERE id_user = ? and path = ?',
         [session.user.name, path],
       );
-      return rows;
+      console.log(rows);
+      return rows as fileData[];
     }
-    
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch all files');

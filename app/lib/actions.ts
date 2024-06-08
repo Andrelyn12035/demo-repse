@@ -7,7 +7,7 @@ import {
   readDecISR,
   readPagoIMSS,
   readPagoISR,
-  writeNewFile
+  writeNewFile,
 } from './data';
 import { writeUser } from './data';
 import { classifyText, pdfToIMG } from './utils';
@@ -20,7 +20,6 @@ export async function authenticate(
   formData: FormData,
 ) {
   try {
-    console.log('formData', formData);
     await signIn('credentials', formData);
   } catch (error) {
     if (error instanceof AuthError) {
@@ -75,7 +74,6 @@ export async function uploadFiles(formData: FormData) {
       const {
         data: { text },
       } = await worker.recognize(imgBuffer);
-      console.log('Text:', text.toUpperCase());
       const type = classifyText(text.toUpperCase());
       console.log('Type:', type);
       switch (type) {

@@ -1,11 +1,16 @@
-
 import React from 'react';
-import { años, meses } from '@/app/lib/placeholder-data';
+import { años, proveedores } from '@/app/lib/placeholder-data';
 import DirLinks from '@/app/ui/documents/dir-links';
+import { auth } from '@/auth';
 
-export default function Page() {
-  //tener un array de links que se actualice segun el directorio en el que se encuentre el usuario una variable de estado para el path del directorio y 
-  return (
-    <DirLinks links={años}/>
-);
+export default async function Page() {
+  const session = await auth();
+  const role = session?.user?.name as string;
+  let links;
+  if (role != '3') {
+    links = <DirLinks links={proveedores} />;
+  } else {
+    links = <DirLinks links={años} />;
+  }
+  return links;
 }

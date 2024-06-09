@@ -3,19 +3,12 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
-  FolderOpenIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { fetchUsers } from '@/app/lib/data';
-import { ProveedoresTableType } from '@/app/lib/definitions';
-import { link } from 'fs';
 
-// Map of links to display in the side navigation.
-// Depending on the size of the application, this would be stored in a database.
-let links = [
-];
+let links = [];
 
 export default function NavLinks({ role }: { role: boolean }) {
   const pathname = usePathname();
@@ -35,7 +28,7 @@ export default function NavLinks({ role }: { role: boolean }) {
       { name: 'Home', href: '/dashboard', icon: HomeIcon },
       {
         name: 'Documentos',
-        href: '/dashboard/documents',
+        href: '/dashboard/documentsAdmin',
         icon: DocumentDuplicateIcon,
       },
       {

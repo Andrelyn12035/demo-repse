@@ -3,8 +3,9 @@ import { DocumentCheckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { fileData, fileInfo } from '@/app/lib/definitions';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { fetchFiles } from '@/app/lib/data';
+import { idContext } from '@/app/dashboard/documentsAdmin/idContextProvider';
 
 type FileLinksProps = {
   links: fileData[];
@@ -12,10 +13,12 @@ type FileLinksProps = {
 
 export default function FileLinks() {
   const pathname = usePathname();
+  const { id, setId } = useContext(idContext) || { id: '', setId: () => {} };
+  console.log('id', id);
   const [files, setFiles] = useState<fileData[]>([]);
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchFiles(pathname);
+      const response = await fetchFiles(pathname, id);
       if (response) {
         setFiles(response);
         console.log(response);

@@ -1,15 +1,6 @@
 'use server';
 import { sql } from '@vercel/postgres';
-import {
-  CustomerField,
-  ProveedoresTableType,
-  InvoiceForm,
-  InvoicesTable,
-  LatestInvoiceRaw,
-  User,
-  Revenue,
-  fileData,
-} from './definitions';
+import { ProveedoresTableType, User, fileData } from './definitions';
 import { OpenAI, ClientOptions } from 'openai';
 import { auth } from '@/auth';
 import { revenue, invoices, users, customers } from './placeholder-data';
@@ -147,49 +138,6 @@ export async function fetchInvoicesPages(query: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of invoices.');
-  }
-}
-
-export async function fetchInvoiceById(id: string) {
-  try {
-    const data = await sql<InvoiceForm>`
-      SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
-    `;
-
-    const invoice = data.rows.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
-    }));
-
-    return invoice[0];
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
-  }
-}
-
-export async function fetchCustomers() {
-  try {
-    const data = await sql<CustomerField>`
-      SELECT
-        id,
-        name
-      FROM customers
-      ORDER BY name ASC
-    `;
-
-    const customers = data.rows;
-    return customers;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
   }
 }
 
@@ -524,15 +472,28 @@ path
 name
 id_user
 */
-export async function writeNewFile(path: string, name: string) {
+export async function writeNewFile(
+  ejercicio: string,
+  periodo: string,
+  tipo: string,
+  name: string,
+  id_user: string | null,
+) {
   try {
     const session = await auth();
-    if (session?.user?.name) {
-      const id_user = session?.user?.name;
-      console.log('params', path, name, id_user);
+    if (id_user) {
+      console.log('params', ejercicio, periodo, tipo, name, id_user);
       const [result, fields] = await db.execute(
-        'INSERT INTO files (path, name, id_user) VALUES (? ,? ,?)',
-        [path, name, id_user],
+        'INSERT INTO files (ejercicio,periodo, tipo, name, id_user) VALUES (? ,? ,?, ?, ?)',
+        [ejercicio, periodo, tipo, name, id_user],
+      );
+      return result;
+    } else if (session?.user?.name) {
+      const id_user = session?.user?.name;
+      console.log('params', ejercicio, periodo, tipo, name, id_user);
+      const [result, fields] = await db.execute(
+        'INSERT INTO files (ejercicio,periodo, tipo, name, id_user) VALUES (? ,? ,?, ?, ?)',
+        [ejercicio, periodo, tipo, name, id_user],
       );
       return result;
     }
@@ -543,16 +504,45 @@ export async function writeNewFile(path: string, name: string) {
   }
 }
 
-export async function fetchFiles(path: string) {
+export async function fetchFiles(path: string, id: string) {
+  try {
+    const session = await auth();
+    if (session?.user?.name) {
+      const params = path.split('/');
+      const tipo = params[params.length - 1];
+      const periodo = params[params.length - 2];
+      const ejercicio = params[params.length - 3];
+      if (id !== '') {
+        const [rows, fields] = await db.execute<RowDataPacket[]>(
+          'SELECT * FROM files WHERE id_user = ? and ejercicio = ? and periodo = ? and tipo = ?',
+          [id, ejercicio, periodo, tipo],
+        );
+        console.log(rows);
+        return rows as fileData[];
+      } else {
+        const [rows, fields] = await db.execute<RowDataPacket[]>(
+          'SELECT * FROM files WHERE id_user = ? and ejercicio = ? and periodo = ? and tipo = ? ',
+          [session.user.name, ejercicio, periodo, tipo],
+        );
+        console.log(rows);
+        return rows as fileData[];
+      }
+    }
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all files');
+  }
+}
+
+export async function fetchProveedores() {
   try {
     const session = await auth();
     if (session?.user?.name) {
       const [rows, fields] = await db.execute<RowDataPacket[]>(
-        'SELECT * FROM files WHERE id_user = ? and path = ?',
-        [session.user.name, path],
+        'SELECT * FROM users WHERE role = 3',
       );
       console.log(rows);
-      return rows as fileData[];
+      return rows as User[];
     }
   } catch (err) {
     console.error('Database Error:', err);

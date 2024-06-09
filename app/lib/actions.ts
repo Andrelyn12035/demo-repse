@@ -54,7 +54,10 @@ export async function getDecIMSS() {
 export async function uploadFiles(formData: FormData) {
   const files = formData.getAll('files');
   console.log('Files:', files);
-  const path = formData.get('path');
+  const ejercicio = formData.get('ejercicio');
+  const periodo = formData.get('periodo');
+  const tipo = formData.get('tipo');
+  const id = formData.get('id');
   let i = 0;
   for (const file of files) {
     if (file instanceof File) {
@@ -62,7 +65,13 @@ export async function uploadFiles(formData: FormData) {
       const fileType = '.' + file.type.split('/')[1];
       const outputFileName = `yourfilenamehere${i}${fileType}`;
       let imgBuffer = buffer;
-      writeNewFile(path as string, file.name);
+      writeNewFile(
+        ejercicio as string,
+        periodo as string,
+        tipo as string,
+        file.name,
+        id as string | null,
+      );
       if (fileType === '.pdf') {
         const base64Str = await pdfToIMG(buffer);
         imgBuffer = Buffer.from(base64Str, 'base64');

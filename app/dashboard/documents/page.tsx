@@ -12,5 +12,5 @@ export default async function Page() {
   } else {
     links = <DirLinks links={años} />;
   }
-  return links;
+  return <DirLinks links={años} />;
 }

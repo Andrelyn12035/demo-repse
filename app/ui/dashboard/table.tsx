@@ -6,6 +6,8 @@ import {
 import { tablaDeclaracionIMSS } from '@/app/lib/definitions';
 import { auth } from '@/auth';
 import { useEffect, useState } from 'react';
+import { useSession, SessionProvider } from 'next-auth/react';
+
 export default function InvoicesTable({
   query /*currentPage,*/,
 }: {
@@ -13,28 +15,31 @@ export default function InvoicesTable({
   /*currentPage: number;*/
 }) {
   const [rows, setRows] = useState<tablaDeclaracionIMSS[]>([]);
-  useEffect(() => {
+  const session = useSession();
+  console.log('session: ', session);
+  /*useEffect(() => {
     console.log('query: ', query);
-
     const user = async () => {
-      const session = await auth();
       if (session?.user) {
         console.log('session: ', session);
         if (session?.user?.image === '1' || session?.user?.image === '2') {
           setRows(await fetchDeclaracionesIMSS());
           console.log('sds: ', rows);
         } else {
-          setRows(
+          /*setRows(
             await fetchFilteredDeclaracionesIMSS(session.user.name || ''),
           );
         }
       }
     };
     user();
-  }, []);
+  }, []);*/
 
   /* currentPage*/
   return (
+    <SessionProvider>
+
+    
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 md:pt-0">
@@ -134,5 +139,6 @@ export default function InvoicesTable({
         </div>
       </div>
     </div>
+    </SessionProvider>
   );
 }

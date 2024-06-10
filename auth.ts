@@ -31,16 +31,12 @@ export const { auth, signIn, signOut} = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      credentials: {
-        name: {},
-        id: {},
-      },
       async authorize(credentials) {
         const parsedCredentials = z
           .object({ rfc: z.string(), password: z.string().min(6) })
           .safeParse(credentials);
         if (parsedCredentials.success) {
-          const { rfc, password } = parsedCredentials.data;
+          const { rfc, password } = parsedCredentials.data as { rfc: string, password: string };
           console.log('rfc:', rfc);
           console.log('password', password);
           const user = await getUser(rfc);
@@ -57,4 +53,17 @@ export const { auth, signIn, signOut} = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    jwt({ token, user }) {
+      console.log('jwt:call', token);
+      if (user) { // User is available during sign-in
+        token.id = user.id 
+      }
+      return token
+    },
+    session({ session, token }) {
+      console.log('session:call', session);
+      return session
+    },
+  },
 });

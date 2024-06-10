@@ -21,7 +21,7 @@ export default function Page() {
     setPeriodo(e.currentTarget.id);
   };
   const [data, setData] = useState<Data[]>([]);
-  useEffect(() => {
+  /*useEffect(() => {
     const fetch = async () => {
       const response = await fetchRFC();
       if (response) {
@@ -30,7 +30,7 @@ export default function Page() {
       }
     };
     fetch();
-  }, []);
+  }, []);*/
 
   return (
     <main>

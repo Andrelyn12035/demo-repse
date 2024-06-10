@@ -6,9 +6,6 @@ import { User, periodo } from '@/app/lib/definitions';
 import { useContext, useEffect, useState } from 'react';
 import { fetchProveedores } from '@/app/lib/data';
 import { idContext } from '@/app/dashboard/documentsAdmin/idContextProvider';
-type DirLinksProps = {
-  links: periodo[];
-};
 
 export default function UserLinks() {
   const pathname = usePathname();

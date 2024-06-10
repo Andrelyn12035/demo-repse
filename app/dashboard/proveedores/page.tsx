@@ -24,7 +24,8 @@ export default async function Page() {
       </h1>
       <div className="mt-6 grid w-full grid-cols-1 gap-6 ">
         <CustomersTable proveedores={rows} />
-        <Form />
+        {session?.user?.image === '1' && <Form />}
+
         {/*currentPage={currentPage}*/}
         {/*<LatestInvoices latestInvoices={latestInvoices} />*/}
       </div>

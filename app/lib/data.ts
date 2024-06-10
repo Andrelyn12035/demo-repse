@@ -1,109 +1,28 @@
 'use server';
-import { sql } from '@vercel/postgres';
-import { ProveedoresTableType, User, fileData } from './definitions';
-import { OpenAI, ClientOptions } from 'openai';
+import { OpenAI } from 'openai';
 import { auth } from '@/auth';
-import { revenue, invoices, users, customers } from './placeholder-data';
-import { formatCurrency, getCurrDate } from './utils';
+import { getCurrDate } from './utils';
 import {
   declaracionIMSS,
   declaracionISR,
   pagoIMSS,
   pagoISR,
   UserData,
+  User,
+  fileData,
+  Data,
+  tablaDeclaracionIMSS,
 } from './definitions'; // for types
 import { db } from './db';
 import { RowDataPacket } from 'mysql2';
-import { get } from 'http';
-import exp from 'constants';
 
-export async function fetchRevenue() {
-  // Add noStore() here to prevent the response from being cached.
-  // This is equivalent to in fetch(..., {cache: 'no-store'}).
-
-  try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    //const data = await sql<Revenue>`SELECT * FROM revenue`;
-
-    // console.log('Data fetch completed after 3 seconds.');
-
-    //return data.rows;
-    return revenue;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch revenue data.');
-  }
-}
-
-export async function fetchLatestInvoices() {
-  try {
-    /*const data = await sql<LatestInvoiceRaw>`
-      SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      ORDER BY invoices.date DESC
-      LIMIT 5`;
-
-    const latestInvoices = data.rows.map((invoice) => ({
-      ...invoice,
-      amount: formatCurrency(invoice.amount),
-    }));
-    return latestInvoices;*/
-    return invoices;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
-  }
-}
-
-export async function fetchCardData() {
-  try {
-    // You can probably combine these into a single SQL query
-    // However, we are intentionally splitting them to demonstrate
-    // how to initialize multiple queries in parallel with JS.
-    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
-    const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
-    const invoiceStatusPromise = sql`SELECT
-         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
-         SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
-         FROM invoices`;
-
-    const data = await Promise.all([
-      invoiceCountPromise,
-      customerCountPromise,
-      invoiceStatusPromise,
-    ]);
-
-    const numberOfInvoices = Number(data[0].rows[0].count ?? '0');
-    const numberOfCustomers = Number(data[1].rows[0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2].rows[0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2].rows[0].pending ?? '0');
-
-    return {
-      numberOfCustomers,
-      numberOfInvoices,
-      totalPaidInvoices,
-      totalPendingInvoices,
-    };
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch card data.');
-  }
-}
-
-const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredDeclaracionesIMSS(query: string) {
   try {
     const [rows, fields] = await db.execute<RowDataPacket[]>(
       'SELECT * FROM declaracionimss WHERE id_user = ?',
       [query],
     );
-    return rows as declaracionIMSS[];
+    return rows as tablaDeclaracionIMSS[];
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
@@ -112,65 +31,14 @@ export async function fetchFilteredDeclaracionesIMSS(query: string) {
 }
 export async function fetchDeclaracionesIMSS() {
   try {
-    const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
-    return rows as declaracionIMSS[];
+    const [rows, fields] = await db.execute(
+      'SELECT d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura;',
+    );
+    return rows as tablaDeclaracionIMSS[];
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch DeclaracionesIMSS.');
-  }
-}
-export async function fetchInvoicesPages(query: string) {
-  try {
-    const count = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
-  `;
-
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
-    return totalPages;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch total number of invoices.');
-  }
-}
-
-export async function fetchFilteredCustomers(query: string) {
-  try {
-    const data = await sql`
-		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
-		WHERE
-		  customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
-	  `;
-
-    const customers = data.rows.map((customer) => ({
-      ...customer,
-      total_pending: formatCurrency(customer.total_pending),
-      total_paid: formatCurrency(customer.total_paid),
-    }));
-
-    return customers;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch customer table.');
   }
 }
 
@@ -224,7 +92,7 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
         content: [
           {
             type: 'text',
-            text: "from the provided image , extract data for each of the example JSON fields between. In the JSON output, replace [data] with each field's extracted data text using only string datatypes. Use a string value of 'N/A' when the field's data text is not found in the provided image. Convert all numbers to a standard 2-place decimal notation. Convert all dates to international format 'yyyy-mm-dd'. For example, dates in the document text may start as something like 18.05.2024 or 3/21/2025, and need to be converted to 2024-05-18 & 2025-03-21 respectively. Some special instructions are: 'titulo' is the title of the document and it usually contains the words 'pago' and-or 'cuotas' is in the top center of the image, 'periodo' is a date under 'PERÍODO QUE COMPRENDE EL PAGO DE SEGUROS IMSS' this date has a 'month-year' format, 'ejercicio' is the year of 'periodo',for 'periodo' return just the month as the month name in spanish, remove dashes from 'rfc', remove all dashes and white spaces in 'lineaCaptura' it should have 53 letters and numbers. All fields must be in upper case and keep original languaje, importeIMSS is the value in the row 'SUBTOTAL SEGUROS IMSS' and the column 'SUMA TOTAL'. This is an example JSON: {'titulo': '[data]', 'lineaCaptura': '[data]','ejercicio': '[data]', 'fechaPago': '[data]', 'periodo': '[data]', 'razonSocial': '[data]', 'registroPatronal': '[data]', 'rfc': '[data]', 'importeIMSS': '[data]', 'total': '[data]'} .Return only the final JSON object. Do not return any other output descriptions or explanations, only the JSON object and make sure is a valid one. No notes. Forget about '```json' and '```' delimiters in the output. Make sure property names are in double quotes.",
+            text: "from the provided image , extract data for each of the example JSON fields between. In the JSON output, replace [data] with each field's extracted data text using only string datatypes. Use a string value of 'N/A' when the field's data text is not found in the provided image. Convert all numbers to a standard 2-place decimal notation. Convert all dates to international format 'yyyy-mm-dd'. For example, dates in the document text may start as something like 18.05.2024 or 3/21/2025, and need to be converted to 2024-05-18 & 2025-03-21 respectively. Some special instructions are: 'titulo' is the title of the document and it usually contains the words 'pago' and-or 'cuotas' is in the top center of the image, 'periodoPago' is a date under 'PERÍODO QUE COMPRENDE EL PAGO DE SEGUROS IMSS' this date has a 'month-year' format, 'ejercicio' is the year of 'periodo',for 'periodo' return just the month as the month name in spanish, remove dashes from 'rfc', remove all dashes and blank spaces in 'lineaCaptura' it should have 53 letters and numbers. All fields must be in upper case and keep original languaje, importeIMSS is the value in the row 'SUBTOTAL SEGUROS IMSS' and the column 'SUMA TOTAL'. This is an example JSON: {'titulo': '[data]', 'lineaCaptura': '[data]','ejercicio': '[data]', 'fechaPago': '[data]', 'periodoPago': '[data]', 'razonSocial': '[data]', 'registroPatronal': '[data]', 'rfc': '[data]', 'importeIMSS': '[data]', 'total': '[data]'} .Return only the final JSON object. Do not return any other output descriptions or explanations, only the JSON object and make sure is a valid one. No notes. Forget about '```json' and '```' delimiters in the output. Make sure property names are in double quotes.",
           },
           {
             type: 'image_url',
@@ -241,9 +109,9 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
     const json = JSON.parse(json_string) as declaracionIMSS;
     console.log(json);
     try {
-      const [result] = await db.execute(
-        'INSERT INTO declaracionimss (titulo, lineaCaptura, fechaPago, periodoPago, razonSocial, registroPatronal, rfc, importeIMSS, total, archivo, fechaProcesamiento, ejercicio, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [
+      const session = await auth();
+      if (session?.user?.name) {
+        console.log([
           json.titulo,
           json.lineaCaptura,
           json.fechaPago,
@@ -256,9 +124,27 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
           filename,
           getCurrDate(),
           json.ejercicio,
-          3,
-        ],
-      );
+          session.user.name,
+        ]);
+        const [result] = await db.execute(
+          'INSERT INTO declaracionimss (titulo, lineaCaptura, fechaPago, periodoPago, razonSocial, registroPatronal, rfc, importeIMSS, total, archivo, fechaProcesamiento, ejercicio, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [
+            json.titulo,
+            json.lineaCaptura,
+            json.fechaPago,
+            json.periodoPago,
+            json.razonSocial,
+            json.registroPatronal,
+            json.rfc,
+            json.importeIMSS,
+            json.total,
+            filename,
+            getCurrDate(),
+            json.ejercicio,
+            session.user.name,
+          ],
+        );
+      }
     } catch (error) {
       console.log(error);
       console.log('Error al insertar en la base de datos declaracionIMSS');
@@ -295,29 +181,32 @@ export async function readDecISR(buffer: Buffer, filename: string) {
     const json = JSON.parse(json_string) as declaracionISR;
     console.log(json);
     try {
-      const [result] = await db.execute(
-        'INSERT INTO declaracionisr (rfc, razonSocial, ejercicio, periodo, conceptoIVA, iva, nombreArchivo, administracion, aCargoISR, observacionISRSyS, titulo, lineaCaptura, totalPagado, tipoDeclaracion, numOperacion, fechaProcesamiento, id_user) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?)',
-        [
-          json.rfc,
-          json.razonSocial,
-          json.ejercicio,
-          json.periodo,
-          json.conceptoIVA,
-          json.iva,
-          filename,
-          json.administracion,
-          json.aCargoISR,
-          json.observacionISRSyS,
-          json.titulo,
-          json.lineaCaptura,
-          json.totalPagado,
-          json.tipoDeclaracion,
-          json.numOperacion,
-          getCurrDate(),
-          3,
-        ],
-      );
-      console.log(result);
+      const session = await auth();
+      if (session?.user?.name) {
+        const [result] = await db.execute(
+          'INSERT INTO declaracionisr (rfc, razonSocial, ejercicio, periodo, conceptoIVA, iva, nombreArchivo, administracion, aCargoISR, observacionISRSyS, titulo, lineaCaptura, totalPagado, tipoDeclaracion, numOperacion, fechaProcesamiento, id_user) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?)',
+          [
+            json.rfc,
+            json.razonSocial,
+            json.ejercicio,
+            json.periodo,
+            json.conceptoIVA,
+            json.iva,
+            filename,
+            json.administracion,
+            json.aCargoISR,
+            json.observacionISRSyS,
+            json.titulo,
+            json.lineaCaptura,
+            json.totalPagado,
+            json.tipoDeclaracion,
+            json.numOperacion,
+            getCurrDate(),
+            session.user.name,
+          ],
+        );
+        console.log(result);
+      }
     } catch (error) {
       console.log(error);
       console.log('Error al insertar en la base de datos declaracionISR');
@@ -349,9 +238,10 @@ export async function readPagoIMSS(buffer: Buffer, filename: string) {
     max_tokens: 4096,
   });
   const json_string = response.choices[0].message.content;
+  console.log(json_string);
   if (json_string) {
     const json = JSON.parse(json_string) as pagoIMSS;
-
+    console.log(json);
     try {
       const session = await auth();
       if (session?.user?.name) {
@@ -543,6 +433,21 @@ export async function fetchProveedores() {
       );
       console.log(rows);
       return rows as User[];
+    }
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all files');
+  }
+}
+
+export async function fetchRFC() {
+  try {
+    const session = await auth();
+    if (session?.user?.name) {
+      const [rows, fields] = await db.execute<RowDataPacket[]>(
+        'SELECT rfc AS name FROM users WHERE role = 3',
+      );
+      return rows as Data[];
     }
   } catch (err) {
     console.error('Database Error:', err);

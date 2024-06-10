@@ -28,10 +28,10 @@ export default function FileLinks() {
   }, []);
   return (
     <>
-      {files.map((link) => {
+      {files.map((link, index) => {
         return (
           <Link
-            key={link.name}
+            key={index}
             id={link.name}
             href="#"
             className="mt-3 flex w-1/2 gap-2 p-2 hover:bg-gray-100 hover:text-blue-600"

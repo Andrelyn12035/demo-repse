@@ -1,5 +1,3 @@
-import { string } from 'zod';
-
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
@@ -8,6 +6,11 @@ export type User = {
   password: string;
   role: string;
 };
+
+export type Data = {
+  name: string;
+};
+
 export type UserData = {
   name: string;
   rfc: string;
@@ -99,7 +102,14 @@ export type declaracionIMSS = {
   fechaProcesamiento: string;
   ejercicio: string;
 };
-
+export type tablaDeclaracionIMSS = {
+  lineaCaptura: string;
+  periodoPago: string;
+  ejercicio: string;
+  lineaP: string;
+  periodoP: string;
+  ejercicioP: string;
+};
 export interface File {
   name: string;
   size: number;

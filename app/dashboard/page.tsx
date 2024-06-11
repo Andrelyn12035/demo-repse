@@ -6,19 +6,34 @@ import { fetchRFC } from '@/app/lib/data';
 import Dropdown from '@/app/ui/dashboard/dropdown';
 import { Data, placeholderData } from '@/app/lib/definitions';
 import { años, meses } from '../lib/placeholder-data';
+import { useSession } from 'next-auth/react';
 
 export default function Page() {
   const [rfc, setRfc] = useState('');
   const [ejercicio, setEjercicio] = useState('');
   const [periodo, setPeriodo] = useState('');
+  const session = useSession();
+  const user = session?.data?.user;
   const handleRfc = (e: React.MouseEvent<HTMLLIElement>) => {
-    setRfc(e.currentTarget.id);
+    if (e.currentTarget.id == rfc) {
+      setRfc('');
+    }else{
+      setRfc(e.currentTarget.id);
+    }
   };
   const handleEjercicio = (e: React.MouseEvent<HTMLLIElement>) => {
-    setEjercicio(e.currentTarget.id);
+    if (e.currentTarget.id == ejercicio) {
+      setEjercicio('');
+    }else{
+      setEjercicio(e.currentTarget.id);
+    }
   };
   const handlePeriodo = (e: React.MouseEvent<HTMLLIElement>) => {
-    setPeriodo(e.currentTarget.id);
+    if (e.currentTarget.id == periodo) {
+      setPeriodo('');
+    }else{
+      setPeriodo(e.currentTarget.id);
+    }
   };
   const [data, setData] = useState<Data[]>([]);
   
@@ -38,17 +53,18 @@ export default function Page() {
         Dashboard
       </h1>
       <div className="flex gap-3 ">
-        <Dropdown data={data} handler={handleRfc}>
-          {rfc == '' && 'RFC'}
-          {rfc != '' && rfc}
+        { session?.data?.user?.image === '1'|| session?.data?.user?.image === '2' && (
+        <Dropdown data={data} selected={rfc} handler={handleRfc}>
+          {rfc == '' && <span className="block w-full">RFC</span>}
+          {rfc != '' && <span className="block w-full font-bold"> {rfc} </span>}
+        </Dropdown>)}
+        <Dropdown data={años} selected={ejercicio} handler={handleEjercicio}>
+          {ejercicio == '' && <span className="block w-full">Ejercicio</span>}
+          {ejercicio != '' && <span className="block w-full font-bold"> {ejercicio} </span>}
         </Dropdown>
-        <Dropdown data={años} handler={handleEjercicio}>
-          {ejercicio == '' && 'Ejercicio'}
-          {ejercicio != '' && ejercicio}
-        </Dropdown>
-        <Dropdown data={meses} handler={handlePeriodo}>
-          {periodo == '' && 'Periodo'}
-          {periodo != '' && periodo}
+        <Dropdown data={meses} selected={periodo} handler={handlePeriodo}>
+          {periodo == '' && <span className="block w-full ">Periodo</span>}
+          {periodo != '' && <span className="block w-full font-bold"> {periodo} </span>}
         </Dropdown>
       </div>
 

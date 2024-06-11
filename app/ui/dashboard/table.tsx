@@ -23,39 +23,22 @@ export default function InvoicesTable({
   const user = session?.data?.user;
   useEffect(() => {
     const user = async () => {
-      console.log('rfc: ', rfc, 'ejercicio: ', ejercicio, 'periodo: ', periodo)
       if (session?.data?.user) {
         if (session.data.user.image === '1' || session.data.user.image === '2') {
           const datos = await fetchDeclaracionesIMSS();
           setRows(datos);
-          let temp;
-          if (rfc !== '' )  {
-            temp = datos.filter((row) => row.rfc === rfc);
-            setRows(temp);
-          }
-          if (ejercicio !== '') {
-            console.log('entra a filtro de ejercicio');
-            temp = datos.filter((row) => row.ejercicio === ejercicio);
-            setRows(temp);
-          }
-          if (periodo !== '') {
-            console.log('entra a filtro de periodo');
-            temp = datos.filter((row) => row.periodoPago === periodo);
-            setRows(temp);
-          }
-          console.log('sds: ', datos);
         } else {
           let temp2 = await fetchFilteredDeclaracionesIMSS(session.data.user.name || '');
           setRows(temp2);
-          console.log('rows: ', rows); 
         }
       }
     };
     user();
-  }, [user, ejercicio, periodo, rfc]);
+  }, [user]);
 
 
   const [filas, setFilas] = useState<tablaDeclaracionIMSS[]>([]);
+  const [filas2, setFilas2] = useState<tablaDeclaracionIMSS[]>([]);
   const [data, setData] = useState<Data[]>([]);
   useEffect(() => {
     const fetch = async () => {
@@ -87,33 +70,46 @@ export default function InvoicesTable({
         });
       });
       setFilas(temp);
-      console.log('temp: ', temp);
-      console.log('filas: ', filas);
     }
-    if(filas.length > 0) {
+    if(filas.length > 0 && rows.length > 0) {
       let nuevo:tablaDeclaracionIMSS[] = [];
-      console.log('rows: ', rows);
-      console.log('filas: ', filas);
-      filas.forEach(value => {
-        rows.forEach(row => {
-          if(value.rfc === row.rfc && value.ejercicio === row.ejercicio && value.periodoPago === row.periodoPago) {
-            nuevo.push(row);
-          }else{
-            nuevo.push(value);
-          }
-        });
-      })
-      console.log('nuevo: ', nuevo);  
+        filas.forEach(value => {
+          rows.forEach(row => {
+            if(value.rfc === row.rfc && value.ejercicio === row.ejercicio && value.periodoPago === row.periodoPago) {
+              nuevo.push(row);
+            }else{
+              nuevo.push(value);
+            }
+          });
+        })
       setFilas(nuevo);
+      setFilas2(nuevo);
+
     }
   },[rows, data])
+
+  useEffect(() => {
+    let aux = filas;
+    if (rfc !== '' )  {
+      aux = aux.filter((row) => row.rfc === rfc);
+      setFilas2(aux);
+    }
+    if (ejercicio !== '') {
+      aux = aux.filter((row) => row.ejercicio === ejercicio);
+      setFilas2(aux);
+    }
+    if (periodo !== '') {
+      aux = aux.filter((row) => row.periodoPago === periodo);
+      setFilas2(aux);
+    }
+  }, [rfc, ejercicio, periodo])
   return (
     
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 md:pt-0">
           <div className="md:hidden">
-            {filas?.map((document, index) => (
+            {filas2?.map((document, index) => (
               
               <div key={index} className="mb-2 w-full rounded-md bg-white p-1">
                 <div className="flex items-center justify-between border-b pb-4">
@@ -181,7 +177,7 @@ export default function InvoicesTable({
               </tr>
             </thead>
             <tbody className="bg-white">
-              {filas?.map((document, index) => (
+              {filas2?.map((document, index) => (
                 <tr
                   key={index}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"

@@ -19,7 +19,7 @@ import { RowDataPacket } from 'mysql2';
 export async function fetchFilteredDeclaracionesIMSS(query: string) {
   try {
     const [rows, fields] = await db.execute<RowDataPacket[]>(
-      'SELECT * FROM declaracionimss WHERE id_user = ?',
+      'SELECT u.rfc, d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura and d.id_user = ? left join users u on d.id_user= u.id',
       [query],
     );
     return rows as tablaDeclaracionIMSS[];

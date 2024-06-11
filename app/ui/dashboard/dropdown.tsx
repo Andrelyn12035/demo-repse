@@ -19,8 +19,8 @@ export default function Dropdown({ data, handler, children }: DropdownProps) {
       >
         <span className="block w-full">{children}</span>
         {isDropdownOpen && (
-          <div className="absolute bottom-full top-full w-full translate-y-5 rounded border-[#3b424d]  bg-[#575761]">
-            <ul className="flex flex-col  rounded ">
+          <div className="absolute bottom-full top-full w-full translate-y-5 rounded border-[#3b424d]  ">
+            <ul className="flex flex-col rounded bg-white">
               {data.map((value, index) => (
                 <li
                   key={index}

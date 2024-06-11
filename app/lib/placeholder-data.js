@@ -195,6 +195,7 @@ const meses = [
   { name: 'DICIEMBRE', path: 'DICIEMBRE' }
 ];
 
+
 const años = [
   { name: '2021', path: '/dashboard/documents/2021' },
   { name: '2022', path: '/dashboard/documents/2022' },
@@ -216,6 +217,31 @@ const proveedores = [
   { name: 'Aja 2', path: 'DMSDSM' }
 ];
 
+const placeholder = [{ ejercicio: '2021', periodoPago: 'ENERO', rfc:'' }];
+placeholder.pop();
+const startYear = 2021;
+const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
+// Get the current date
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const currentMonth = currentDate.getMonth(); // 0-based index
+
+for (let year = startYear; year <= currentYear; year++) {
+  for (let monthIndex = 0; monthIndex < months.length; monthIndex++) {
+    // If the year is the current year and the month is after the current month, stop adding months
+    if (year === currentYear && monthIndex > 5) { // 5 is June (0-based index)
+      break;
+    }
+    if (year === currentYear && monthIndex > currentMonth) {
+      break;
+    }
+    placeholder.push({ ejercicio: year.toString(), periodoPago: months[monthIndex] });
+  }
+}
+
+console.log(placeholder);
+
 module.exports = {
   users,
   customers,
@@ -224,5 +250,6 @@ module.exports = {
   meses,
   años,
   tipos,
-  proveedores
+  proveedores,
+  placeholder,
 };

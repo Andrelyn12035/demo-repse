@@ -103,12 +103,13 @@ export type declaracionIMSS = {
   ejercicio: string;
 };
 export type tablaDeclaracionIMSS = {
-  lineaCaptura: string;
+  rfc: string;
+  lineaCaptura?: string;
   periodoPago: string;
   ejercicio: string;
-  lineaP: string;
-  periodoP: string;
-  ejercicioP: string;
+  lineaP?: string;
+  periodoP?: string;
+  ejercicioP?: string;
 };
 export interface File {
   name: string;
@@ -122,7 +123,15 @@ export interface periodo {
   name: string;
   path: string;
 }
-
+export interface placeholderData {
+  rfc: string;
+  lineaCaptura?: string;
+  periodoPago: string;
+  ejercicio: string;
+  lineaP?: string;
+  periodoP?: string;
+  ejercicioP?: string;
+}
 export interface fileInfo {
   name: string;
   link: string;

@@ -32,8 +32,9 @@ export async function fetchFilteredDeclaracionesIMSS(query: string) {
 export async function fetchDeclaracionesIMSS() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura;',
+      'SELECT u.rfc, d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
     );
+    console.log(rows);
     return rows as tablaDeclaracionIMSS[];
     //return invoices.rows;
   } catch (error) {
@@ -81,7 +82,7 @@ export async function getPagoISR(query: string, data: pagoISR[]) {
   }
 }
 
-export async function readDecIMSS(buffer: Buffer, filename: string) {
+export async function readDecIMSS(buffer: Buffer, filename: string, id_user: string | null) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -92,7 +93,7 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
         content: [
           {
             type: 'text',
-            text: "from the provided image , extract data for each of the example JSON fields between. In the JSON output, replace [data] with each field's extracted data text using only string datatypes. Use a string value of 'N/A' when the field's data text is not found in the provided image. Convert all numbers to a standard 2-place decimal notation. Convert all dates to international format 'yyyy-mm-dd'. For example, dates in the document text may start as something like 18.05.2024 or 3/21/2025, and need to be converted to 2024-05-18 & 2025-03-21 respectively. Some special instructions are: 'titulo' is the title of the document and it usually contains the words 'pago' and-or 'cuotas' is in the top center of the image, 'periodoPago' is a date under 'PERÍODO QUE COMPRENDE EL PAGO DE SEGUROS IMSS' this date has a 'month-year' format, 'ejercicio' is the year of 'periodo',for 'periodo' return just the month as the month name in spanish, remove dashes from 'rfc', remove all dashes and blank spaces in 'lineaCaptura' it should have 53 letters and numbers. All fields must be in upper case and keep original languaje, importeIMSS is the value in the row 'SUBTOTAL SEGUROS IMSS' and the column 'SUMA TOTAL'. This is an example JSON: {'titulo': '[data]', 'lineaCaptura': '[data]','ejercicio': '[data]', 'fechaPago': '[data]', 'periodoPago': '[data]', 'razonSocial': '[data]', 'registroPatronal': '[data]', 'rfc': '[data]', 'importeIMSS': '[data]', 'total': '[data]'} .Return only the final JSON object. Do not return any other output descriptions or explanations, only the JSON object and make sure is a valid one. No notes. Forget about '```json' and '```' delimiters in the output. Make sure property names are in double quotes.",
+            text: "from the provided image , extract data for each of the example JSON fields between. In the JSON output, replace [data] with each field's extracted data text using only string datatypes. Use a string value of 'N/A' when the field's data text is not found in the provided image. Convert all numbers to a standard 2-place decimal notation. Convert all dates to international format 'yyyy-mm-dd'. For example, dates in the document text may start as something like 18.05.2024 or 3/21/2025, and need to be converted to 2024-05-18 & 2025-03-21 respectively. Some special instructions are: 'titulo' is the title of the document and it usually contains the words 'pago' and-or 'cuotas' is in the top center of the image, 'periodoPago' is a date under 'PERÍODO QUE COMPRENDE EL PAGO DE SEGUROS IMSS' this date has a 'month-year' format, 'ejercicio' is the year of 'periodo',for 'periodoPago' return just the month as the month name in spanish, remove dashes from 'rfc', remove all dashes and blank spaces in 'lineaCaptura' it should have 53 letters and numbers. All fields must be in upper case and keep original languaje, importeIMSS is the value in the row 'SUBTOTAL SEGUROS IMSS' and the column 'SUMA TOTAL'. This is an example JSON: {'titulo': '[data]', 'lineaCaptura': '[data]','ejercicio': '[data]', 'fechaPago': '[data]', 'periodoPago': '[data]', 'razonSocial': '[data]', 'registroPatronal': '[data]', 'rfc': '[data]', 'importeIMSS': '[data]', 'total': '[data]'} .Return only the final JSON object. Do not return any other output descriptions or explanations, only the JSON object and make sure is a valid one. No notes. Forget about '```json' and '```' delimiters in the output. Make sure property names are in double quotes.",
           },
           {
             type: 'image_url',
@@ -110,22 +111,13 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
     console.log(json);
     try {
       const session = await auth();
-      if (session?.user?.name) {
-        console.log([
-          json.titulo,
-          json.lineaCaptura,
-          json.fechaPago,
-          json.periodoPago,
-          json.razonSocial,
-          json.registroPatronal,
-          json.rfc,
-          json.importeIMSS,
-          json.total,
-          filename,
-          getCurrDate(),
-          json.ejercicio,
-          session.user.name,
-        ]);
+      let id
+      if (id_user){
+        id = id_user
+      }else{
+        id = session?.user?.name
+      }
+      if (id) {
         const [result] = await db.execute(
           'INSERT INTO declaracionimss (titulo, lineaCaptura, fechaPago, periodoPago, razonSocial, registroPatronal, rfc, importeIMSS, total, archivo, fechaProcesamiento, ejercicio, id_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
           [
@@ -141,7 +133,7 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
             filename,
             getCurrDate(),
             json.ejercicio,
-            session.user.name,
+            id,
           ],
         );
       }
@@ -153,7 +145,7 @@ export async function readDecIMSS(buffer: Buffer, filename: string) {
   }
 }
 
-export async function readDecISR(buffer: Buffer, filename: string) {
+export async function readDecISR(buffer: Buffer, filename: string , id_user: string | null) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -182,7 +174,13 @@ export async function readDecISR(buffer: Buffer, filename: string) {
     console.log(json);
     try {
       const session = await auth();
-      if (session?.user?.name) {
+      let id
+      if (id_user){
+        id = id_user
+      }else{
+        id = session?.user?.name
+      }
+      if (id) {
         const [result] = await db.execute(
           'INSERT INTO declaracionisr (rfc, razonSocial, ejercicio, periodo, conceptoIVA, iva, nombreArchivo, administracion, aCargoISR, observacionISRSyS, titulo, lineaCaptura, totalPagado, tipoDeclaracion, numOperacion, fechaProcesamiento, id_user) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?)',
           [
@@ -202,7 +200,7 @@ export async function readDecISR(buffer: Buffer, filename: string) {
             json.tipoDeclaracion,
             json.numOperacion,
             getCurrDate(),
-            session.user.name,
+            id,
           ],
         );
         console.log(result);
@@ -215,7 +213,7 @@ export async function readDecISR(buffer: Buffer, filename: string) {
   }
 }
 
-export async function readPagoIMSS(buffer: Buffer, filename: string) {
+export async function readPagoIMSS(buffer: Buffer, filename: string, id_user: string | null) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -244,7 +242,13 @@ export async function readPagoIMSS(buffer: Buffer, filename: string) {
     console.log(json);
     try {
       const session = await auth();
-      if (session?.user?.name) {
+      let id
+      if (id_user){
+        id = id_user
+      }else{
+        id = session?.user?.name
+      }
+      if (id) {
         const [result] = await db.execute(
           'INSERT INTO pagoimss (folioSUA, titulo, periodo, ejercicio, lineaCaptura, registroPatronal, importeIMSS, importeRCV, importeVIV, importeACV, totalAPagar, banco, fechaPago, archivo, fechaProcesamiento, id_user) VALUES (?, ? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?)',
           [
@@ -263,7 +267,7 @@ export async function readPagoIMSS(buffer: Buffer, filename: string) {
             json.fechaPago,
             filename,
             getCurrDate(),
-            session.user.name,
+            id,
           ],
         );
 
@@ -277,7 +281,7 @@ export async function readPagoIMSS(buffer: Buffer, filename: string) {
   }
 }
 
-export async function readPagoISR(buffer: Buffer, filename: string) {
+export async function readPagoISR(buffer: Buffer, filename: string, id_user: string | null) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -306,7 +310,13 @@ export async function readPagoISR(buffer: Buffer, filename: string) {
     console.log(json);
     try {
       const session = await auth();
-      if (session?.user?.name) {
+      let id
+      if (id_user){
+        id = id_user
+      }else{
+        id = session?.user?.name
+      }
+      if (id) {
         const [result] = await db.execute(
           'INSERT INTO pagoisr (titulo, lineaCaptura, fechaPago, totalAPagar, banco, nombreSolicitante, nombreArchivo, fechaProcesamiento, id_user) VALUES (?,? ,? ,? ,? ,? ,? ,? ,?)',
           [
@@ -318,7 +328,7 @@ export async function readPagoISR(buffer: Buffer, filename: string) {
             json.nombreSolicitante,
             filename,
             getCurrDate(),
-            session?.user?.name,
+            id,
           ],
         );
         console.log(result);

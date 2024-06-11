@@ -27,7 +27,7 @@ async function getUser(rfc: string): Promise<User2 | undefined> {
   }
 }
 
-export const { auth, signIn, signOut} = NextAuth({
+export const { handlers: { GET, POST }, auth, signIn, signOut} = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
@@ -55,14 +55,12 @@ export const { auth, signIn, signOut} = NextAuth({
   ],
   callbacks: {
     jwt({ token, user }) {
-      console.log('jwt:call', token);
       if (user) { // User is available during sign-in
         token.id = user.id 
       }
       return token
     },
     session({ session, token }) {
-      console.log('session:call', session);
       return session
     },
   },

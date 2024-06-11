@@ -87,16 +87,16 @@ export async function uploadFiles(formData: FormData) {
       console.log('Type:', type);
       switch (type) {
         case 1:
-          readDecIMSS(imgBuffer, file.name);
+          readDecIMSS(imgBuffer, file.name, id as string | null);
           break;
         case 2:
-          readDecISR(imgBuffer, file.name);
+          readDecISR(imgBuffer, file.name, id as string | null);
           break;
         case 3:
-          readPagoIMSS(imgBuffer, file.name);
+          readPagoIMSS(imgBuffer, file.name, id as string | null);
           break;
         case 4:
-          readPagoISR(imgBuffer, file.name);
+          readPagoISR(imgBuffer, file.name, id as string | null);
           break;
         default:
           break;

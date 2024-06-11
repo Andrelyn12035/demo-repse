@@ -4,8 +4,8 @@ import InvoicesTable from '@/app/ui/dashboard/table';
 import { useEffect, useState } from 'react';
 import { fetchRFC } from '@/app/lib/data';
 import Dropdown from '@/app/ui/dashboard/dropdown';
-import { Data } from '@/app/lib/definitions';
-import { años, meses } from '../lib/placeholder-data';
+import { Data, placeholderData } from '@/app/lib/definitions';
+import { años, meses, placeholder } from '../lib/placeholder-data';
 
 export default function Page() {
   const [rfc, setRfc] = useState('');
@@ -21,20 +21,20 @@ export default function Page() {
     setPeriodo(e.currentTarget.id);
   };
   const [data, setData] = useState<Data[]>([]);
-  /*useEffect(() => {
+  
+  useEffect(() => {
     const fetch = async () => {
       const response = await fetchRFC();
       if (response) {
         setData(response);
-        console.log(response);
       }
     };
     fetch();
-  }, []);*/
-
+  }, []);
+  
   return (
     <main>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+      <h1 className={` mb-4 text-xl md:text-2xl`}>
         Dashboard
       </h1>
       <div className="flex gap-3 ">
@@ -54,7 +54,7 @@ export default function Page() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-8 lg:grid-cols-8">
         {/*<InvoicesTable rfc={rfc} ejercicio={ejercicio} periodo={periodo} />*/}
-        <InvoicesTable query={''} />
+        <InvoicesTable rfc={rfc} ejercicio={ejercicio} periodo={periodo} />
       </div>
     </main>
   );

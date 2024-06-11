@@ -1,3 +1,4 @@
+import mime from 'mime-types';
 import { placeholderData} from './definitions';
 import fs from 'fs';
 
@@ -124,4 +125,44 @@ export const getPlaceholder = () => {
     }
   }
   return placeholder;
+}
+
+async function refreshToken() {
+  try {
+      const response = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+              redirect_uri: 'http://localhost/dashboard',
+              client_id: '50ada1c0-a854-4782-aee3-d605d0253732',
+              client_secret: onedrive_client_secret,
+              refresh_token: onedrive_refresh_token,
+              grant_type: 'refresh_token'
+          })
+      });
+
+      if (!response.ok) {
+          throw new Error(`Failed to refresh token: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const accessToken = data.access_token;
+
+          const uploadResponse = await fetch(`https://graph.microsoft.com/v1.0/drive/root:/${onedrive_folder}/${onedrive_filename}:/content`, {
+              method: 'PUT',
+              headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+                  'Content-Type': mime.lookup(file) || 'application/octet-stream'
+              },
+              body: fileContent
+          });
+
+          if (!uploadResponse.ok) {
+              throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
+          }
+
+          const uploadResult = await uploadResponse.text();
+          console.log(uploadResult);
 }

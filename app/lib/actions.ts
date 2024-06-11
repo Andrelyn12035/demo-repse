@@ -118,44 +118,7 @@ export async function uploadFiles(formData: FormData) {
       let buffer = Buffer.from(await file.arrayBuffer());
       const fileType = '.' + file.type.split('/')[1];
       const outputFileName = `yourfilenamehere${i}${fileType}`;
-      let imgBuffer = buffer;
-      writeNewFile(
-        ejercicio as string,
-        periodo as string,
-        tipo as string,
-        file.name,
-        id as string | null,
-      );
-      if (fileType === '.pdf') {
-        const base64Str = await pdfToIMG(buffer);
-        imgBuffer = Buffer.from(base64Str, 'base64');
-      }
-      const worker = await createWorker('spa', 1, {
-        workerPath:
-          './node_modules/tesseract.js/src/worker-script/node/index.js',
-      });
-      const {
-        data: { text },
-      } = await worker.recognize(imgBuffer);
-      const type = classifyText(text.toUpperCase());
-      console.log('Type:', type);
-      switch (type) {
-        case 1:
-          readDecIMSS(imgBuffer, file.name, id as string | null);
-          break;
-        case 2:
-          readDecISR(imgBuffer, file.name, id as string | null);
-          break;
-        case 3:
-          readPagoIMSS(imgBuffer, file.name, id as string | null);
-          break;
-        case 4:
-          readPagoISR(imgBuffer, file.name, id as string | null);
-          break;
-        default:
-          break;
-      }
-      await worker.terminate();
+      
     }
     i++;
   }

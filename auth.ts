@@ -17,7 +17,7 @@ async function getUser(rfc: string): Promise<User2 | undefined> {
     let a = user[0] as User;
     const n_user = {} as User2;
     n_user.name = a.id
-    n_user.email = a.name
+    n_user.email = a.rfc
     n_user.image = a.role
     console.log('user get usu:', n_user);
     return n_user; // Cast the result to User type

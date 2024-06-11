@@ -32,7 +32,7 @@ export async function fetchFilteredDeclaracionesIMSS(query: string) {
 export async function fetchDeclaracionesIMSS() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT u.rfc, d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
+      'SELECT  u.rfc, d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id ;',
     );
     console.log(rows);
     return rows as tablaDeclaracionIMSS[];

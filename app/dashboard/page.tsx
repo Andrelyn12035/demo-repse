@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { fetchRFC } from '@/app/lib/data';
 import Dropdown from '@/app/ui/dashboard/dropdown';
 import { Data, placeholderData } from '@/app/lib/definitions';
-import { años, meses, placeholder } from '../lib/placeholder-data';
+import { años, meses } from '../lib/placeholder-data';
 
 export default function Page() {
   const [rfc, setRfc] = useState('');

@@ -7,9 +7,8 @@ import {
 import { Data, placeholderData, tablaDeclaracionIMSS } from '@/app/lib/definitions';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { placeholder } from '@/app/lib/placeholder-data';
 import { set } from 'zod';
-
+import { getPlaceholder } from '@/app/lib/utils'; 
 export default function InvoicesTable({
   rfc,
   ejercicio,
@@ -28,9 +27,7 @@ export default function InvoicesTable({
       if (session?.data?.user) {
         if (session.data.user.image === '1' || session.data.user.image === '2') {
           const datos = await fetchDeclaracionesIMSS();
-          console.log('datos: ', datos);
           setRows(datos);
-          console.log('rows:pre', rows);
           let temp;
           if (rfc !== '' )  {
             temp = datos.filter((row) => row.rfc === rfc);
@@ -48,48 +45,68 @@ export default function InvoicesTable({
           }
           console.log('sds: ', datos);
         } else {
-          setRows(
-            await fetchFilteredDeclaracionesIMSS(session.data.user.name || ''),
-          );
+          let temp2 = await fetchFilteredDeclaracionesIMSS(session.data.user.name || '');
+          setRows(temp2);
+          console.log('rows: ', rows); 
         }
       }
     };
     user();
   }, [user, ejercicio, periodo, rfc]);
 
+
+  const [filas, setFilas] = useState<tablaDeclaracionIMSS[]>([]);
   const [data, setData] = useState<Data[]>([]);
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchRFC();
-      if (response) {
-        setData(response);
+      if (session?.data?.user) {
+        if (session.data.user.image === '1' || session.data.user.image === '2') {
+          const response = await fetchRFC();
+          if (response) {
+          setData(response);
+          }
+        }else{
+          setData([{name: session.data.user.email || ''}]);
+        }
       }
     };
     fetch();
-  }, []);
-  const [filas, setFilas] = useState<tablaDeclaracionIMSS[]>([]);
-  useEffect(() => {
-    let temp:placeholderData[] = [];
+  }, [user]);
 
-    if(rows.length === 0) {
-    data.forEach(value => {
-      console.log('value: ', value);
-      placeholder.forEach(periodo => {
-        let si = periodo
-        si.rfc = value.name
-        console.log('si: ', si);
-        temp.push(si);
-        console.log('temo: ', temp)
+  useEffect(() => {
+    if (data.length > 0) {
+      let placeholder = getPlaceholder();
+      let temp:placeholderData[] = [];
+      data.forEach(value => {
+        placeholder.forEach(periodo => {
+          let si: placeholderData = {};
+          si.ejercicio = periodo.ejercicio;
+          si.periodoPago = periodo.periodoPago;
+          si.rfc = value.name
+          temp.push(si);
+        });
       });
-    });
       setFilas(temp);
       console.log('temp: ', temp);
-    }else{
-      setFilas(rows);
-      temp = [];
+      console.log('filas: ', filas);
     }
-  }, [rows])
-  console.log('rows: ', rows);
+    if(filas.length > 0) {
+      let nuevo:tablaDeclaracionIMSS[] = [];
+      console.log('rows: ', rows);
+      console.log('filas: ', filas);
+      filas.forEach(value => {
+        rows.forEach(row => {
+          if(value.rfc === row.rfc && value.ejercicio === row.ejercicio && value.periodoPago === row.periodoPago) {
+            nuevo.push(row);
+          }else{
+            nuevo.push(value);
+          }
+        });
+      })
+      console.log('nuevo: ', nuevo);  
+      setFilas(nuevo);
+    }
+  },[rows, data])
   return (
     
     <div className="mt-6 flow-root">

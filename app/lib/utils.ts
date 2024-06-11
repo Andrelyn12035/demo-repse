@@ -1,4 +1,4 @@
-import { Revenue } from './definitions';
+import { placeholderData} from './definitions';
 import fs from 'fs';
 
 export const formatCurrency = (amount: number) => {
@@ -22,19 +22,6 @@ export const formatDateToLocal = (
   return formatter.format(date);
 };
 
-export const generateYAxis = (revenue: Revenue[]) => {
-  // Calculate what labels we need to display on the y-axis
-  // based on highest record and in 1000s
-  const yAxisLabels = [];
-  const highestRecord = Math.max(...revenue.map((month) => month.revenue));
-  const topLabel = Math.ceil(highestRecord / 1000) * 1000;
-
-  for (let i = topLabel; i >= 0; i -= 1000) {
-    yAxisLabels.push(`$${i / 1000}K`);
-  }
-
-  return { yAxisLabels, topLabel };
-};
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,
@@ -115,3 +102,26 @@ export const getCurrDate = (): string => {
     .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   return formattedDate;
 };
+
+export const getPlaceholder = () => {
+  let placeholder: placeholderData[] = []
+  const startYear = 2021;
+  const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+  // Get the current date
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth(); // 0-based index
+  for (let year = startYear; year <= currentYear; year++) {
+    for (let monthIndex = 0; monthIndex < months.length; monthIndex++) {
+      // If the year is the current year and the month is after the current month, stop adding months
+      if (year === currentYear && monthIndex > 5) { // 5 is June (0-based index)
+        break;
+      }
+      if (year === currentYear && monthIndex > currentMonth) {
+        break;
+      }
+      placeholder.push({ ejercicio: year.toString(), periodoPago: months[monthIndex] });
+    }
+  }
+  return placeholder;
+}

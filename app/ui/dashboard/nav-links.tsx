@@ -16,7 +16,11 @@ export default function NavLinks({ role }: { role: boolean }) {
 
   if (!role) {
     links = [
-      { name: 'Home', href: '/dashboard', icon: HomeIcon },
+      { name: 'Controles generales', href: '/dashboard', icon: HomeIcon },
+      { name: 'Declaraciones federales y pago', href: '/dashboard/federales', icon: HomeIcon },
+      { name: 'Declaraciones seguridad social y pago', href: '/dashboard/imss', icon: HomeIcon },
+      { name: 'Recibos de nómina', href: '/dashboard/nomina', icon: HomeIcon },
+      { name: 'Complementos de pago pendientes ', href: '/dashboard/complemento', icon: HomeIcon },
       {
         name: 'Documentos',
         href: '/dashboard/documents',
@@ -25,17 +29,16 @@ export default function NavLinks({ role }: { role: boolean }) {
     ];
   } else {
     links = [
-      { name: 'Home', href: '/dashboard', icon: HomeIcon },
+      { name: 'Controles generales', href: '/dashboard', icon: HomeIcon },
+      { name: 'Declaraciones federales y pago', href: '/dashboard/federales', icon: HomeIcon },
+      { name: 'Declaraciones seguridad social y pago', href: '/dashboard/imss', icon: HomeIcon },
+      { name: 'Recibos de nómina', href: '/dashboard/nomina', icon: HomeIcon },
+      { name: 'Complementos de pago pendientes ', href: '/dashboard/complemento', icon: HomeIcon },
       {
         name: 'Documentos',
         href: '/dashboard/documentsAdmin',
         icon: DocumentDuplicateIcon,
-      },
-      {
-        name: 'Proveedores',
-        href: '/dashboard/proveedores',
-        icon: UserGroupIcon,
-      },
+      }
     ];
   }
   return (

@@ -126,7 +126,7 @@ export const getPlaceholder = () => {
   }
   return placeholder;
 }
-
+/*
 async function refreshToken() {
   try {
       const response = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
@@ -166,3 +166,4 @@ async function refreshToken() {
           const uploadResult = await uploadResponse.text();
           console.log(uploadResult);
 }
+*/

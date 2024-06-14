@@ -12,9 +12,52 @@ import {
   fileData,
   Data,
   tablaDeclaracionIMSS,
+  tablaGenerales,
+  tablaDeclaracionISR,
 } from './definitions'; // for types
 import { db } from './db';
 import { RowDataPacket } from 'mysql2';
+
+export async function fetchGenerales() {
+  try {
+    const [rows, fields] = await db.execute(
+      'SELECT  * from generales;',
+    );
+    console.log(rows);
+    return rows as tablaGenerales[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch DeclaracionesIMSS.');
+  }
+}
+
+export async function fetchComplemento() {
+  try {
+    const [rows, fields] = await db.execute(
+      'SELECT  * from complemento;',
+    );
+    return rows as tablaGenerales[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch DeclaracionesIMSS.');
+  }
+}
+
+export async function fetchNomina() {
+  try {
+    const [rows, fields] = await db.execute(
+      'SELECT  * from recibos;',
+    );
+    console.log(rows);
+    return rows as tablaGenerales[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch DeclaracionesIMSS.');
+  }
+}
 
 export async function fetchFilteredDeclaracionesIMSS(query: string) {
   try {
@@ -32,10 +75,24 @@ export async function fetchFilteredDeclaracionesIMSS(query: string) {
 export async function fetchDeclaracionesIMSS() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT  u.rfc, d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id ;',
+      'SELECT u.rfc, d.ejercicio as Ejercicio, d.periodoPago as Mes, d.registroPatronal as Registro_patronal, d.total as Total_a_pagar, d.lineaCaptura as Linea_de_captura_SIPARE, p.banco as Banco, p.fechaPago as Fecha_pago, p.totalAPagar as Total_Pago, p.lineaCaptura AS Linea_de_captura_banco FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
     );
     console.log(rows);
     return rows as tablaDeclaracionIMSS[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch DeclaracionesIMSS.');
+  }
+}
+
+export async function fetchDeclaracionesISR() {
+  try {
+    const [rows, fields] = await db.execute(
+      'SELECT u.rfc as Proveedor, d.ejercicio as Ejercicio,d.periodo as Mes,d.numOperacion as Numero_de_Operacion,d.aCargoISR as Monto_ISR_Retenido_SyS,d.iva as Monto_IVA_Acreditable,d.iva as Monto_IVA_a_cargo,d.totalPagado as Total_declaracion,d.lineaCaptura as Linea_de_captura_declaracion,p.banco as Banco,p.fechaPago as Fecha_pago,p.totalAPagar as Total_Pago,p.lineaCaptura AS Linea_de_captura_banco FROM declaracionisr d LEFT JOIN pagoisr p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
+    );
+    console.log(rows);
+    return rows as tablaDeclaracionISR[];
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
@@ -464,3 +521,4 @@ export async function fetchRFC() {
     throw new Error('Failed to fetch all files');
   }
 }
+

@@ -181,18 +181,18 @@ const revenue = [
 ];
 
 const meses = [
-  { name: 'ENERO', path: 'ENERO' },
-  { name: 'FEBRERO', path: 'FEBRERO' },
-  { name: 'MARZO', path: 'MARZO' },
-  { name: 'ABRIL', path: 'ABRIL' },
-  { name: 'MAYO', path: 'MAYO' },
-  { name: 'JUNIO', path: 'JUNIO' },
-  { name: 'JULIO', path: 'JULIO' },
-  { name: 'AGOSTO', path: 'AGOSTO' },
-  { name: 'SEPTIEMBRE', path: 'SEPTIEMBRE' },
-  { name: 'OCTUBRE', path: 'OCTUBRE' },
-  { name: 'NOVIEMBRE', path: 'NOVIEMBRE' },
-  { name: 'DICIEMBRE', path: 'DICIEMBRE' }
+  { name: 'Enero', path: 'Enero' },
+  { name: 'Febrero', path: 'Febrero' },
+  { name: 'Marzo', path: 'Marzo' },
+  { name: 'Abril', path: 'Abril' },
+  { name: 'Mayo', path: 'Mayo' },
+  { name: 'Junio', path: 'Junio' },
+  { name: 'Julio', path: 'Julio' },
+  { name: 'Agosto', path: 'Agosto' },
+  { name: 'Septiembre', path: 'Septiembre' },
+  { name: 'Octubre', path: 'Octubre' },
+  { name: 'Noviembre', path: 'Noviembre' },
+  { name: 'Diciembre', path: 'Diciembre' }
 ];
 
 
@@ -207,7 +207,8 @@ const tipos = [
   { name: 'Declaracion IMSS', path: 'Decimss' },
   { name: 'Declaracion ISR', path: 'Decisr' },
   { name: 'Pago IMSS', path: 'Paimss' },
-  { name: 'Pago ISR', path: 'Paisr' }
+  { name: 'Pago ISR', path: 'Paisr' },
+  { name: 'Otros documentos', path: 'Otros' }
 ];
 
 const proveedores = [
@@ -227,5 +228,5 @@ module.exports = {
   años,
   tipos,
   proveedores,
-  
+
 };

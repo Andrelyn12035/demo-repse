@@ -21,49 +21,87 @@ import { RowDataPacket } from 'mysql2';
 export async function fetchGenerales() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT  * from generales;',
+      'select * from generales g left join users u on g.id_user = u.id',
     );
     console.log(rows);
     return rows as tablaGenerales[];
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch DeclaracionesIMSS.');
+    throw new Error('Failed to fetch fetchGenerales.');
   }
 }
-
+export async function fetchGeneralesFiltered(id: string) {
+  try {
+    const [rows, fields] = await db.execute(
+      'select * from generales g left join users u on g.id_user = u.id where g.id_user = ?',
+      [id],
+    );
+    return rows as tablaGenerales[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch fetchGeneralesFiltered.');
+  }
+}
 export async function fetchComplemento() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT  * from complemento;',
+      'SELECT  * from complemento c left join users u on c.id_user = u.id;',
     );
     return rows as tablaGenerales[];
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch DeclaracionesIMSS.');
+    throw new Error('Failed to fetch fetchComplemento.');
   }
 }
-
+export async function fetchComplementoFiltered(id: string) {
+  try {
+    const [rows, fields] = await db.execute(
+      'SELECT  * from complemento c left join users u on c.id_user = u.id where c.id_user = ?;',
+      [id],
+    );
+    return rows as tablaGenerales[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch fetchComplementoFiltered.');
+  }
+}
 export async function fetchNomina() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT  * from recibos;',
+      'SELECT  * from recibos r left join users u on r.id_user = u.id;',
     );
     console.log(rows);
     return rows as tablaGenerales[];
     //return invoices.rows;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch DeclaracionesIMSS.');
+    throw new Error('Failed to fetch fetchNomina.');
+  }
+}
+export async function fetchNominaFiltered(id: string) {
+  try {
+    const [rows, fields] = await db.execute(
+      'SELECT  * from recibos r left join users u on r.id_user = u.id where r.id_user = ?;',
+      [id],
+    );
+    console.log(rows);
+    return rows as tablaGenerales[];
+    //return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch fetchNominaFiltered.');
   }
 }
 
-export async function fetchFilteredDeclaracionesIMSS(query: string) {
+export async function fetchFilteredDeclaracionesIMSS(id: string) {
   try {
     const [rows, fields] = await db.execute<RowDataPacket[]>(
-      'SELECT u.rfc, d.ejercicio, d.periodoPago, d.lineaCaptura, p.ejercicio AS ejercicioP, p.periodo AS periodoP, p.lineaCaptura AS lineaP FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura and d.id_user = ? left join users u on d.id_user= u.id',
-      [query],
+      'SELECT u.name as Proveedor, d.ejercicio as Ejercicio, d.periodoPago as Mes, d.registroPatronal as Registro_patronal, d.total as Total_a_pagar, d.lineaCaptura as Linea_de_captura_SIPARE, p.banco as Banco, p.fechaPago as Fecha_pago, p.totalAPagar as Total_Pago, p.lineaCaptura AS Linea_de_captura_banco FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id where d.id_user = ?;',
+      [id],
     );
     return rows as tablaDeclaracionIMSS[];
     //return invoices.rows;
@@ -75,7 +113,7 @@ export async function fetchFilteredDeclaracionesIMSS(query: string) {
 export async function fetchDeclaracionesIMSS() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT u.rfc, d.ejercicio as Ejercicio, d.periodoPago as Mes, d.registroPatronal as Registro_patronal, d.total as Total_a_pagar, d.lineaCaptura as Linea_de_captura_SIPARE, p.banco as Banco, p.fechaPago as Fecha_pago, p.totalAPagar as Total_Pago, p.lineaCaptura AS Linea_de_captura_banco FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
+      'SELECT u.name as Proveedor, d.ejercicio as Ejercicio, d.periodoPago as Mes, d.registroPatronal as Registro_patronal, d.total as Total_a_pagar, d.lineaCaptura as Linea_de_captura_SIPARE, p.banco as Banco, p.fechaPago as Fecha_pago, p.totalAPagar as Total_Pago, p.lineaCaptura AS Linea_de_captura_banco FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
     );
     console.log(rows);
     return rows as tablaDeclaracionIMSS[];
@@ -89,9 +127,8 @@ export async function fetchDeclaracionesIMSS() {
 export async function fetchDeclaracionesISR() {
   try {
     const [rows, fields] = await db.execute(
-      'SELECT u.rfc as Proveedor, d.ejercicio as Ejercicio,d.periodo as Mes,d.numOperacion as Numero_de_Operacion,d.aCargoISR as Monto_ISR_Retenido_SyS,d.iva as Monto_IVA_Acreditable,d.iva as Monto_IVA_a_cargo,d.totalPagado as Total_declaracion,d.lineaCaptura as Linea_de_captura_declaracion,p.banco as Banco,p.fechaPago as Fecha_pago,p.totalAPagar as Total_Pago,p.lineaCaptura AS Linea_de_captura_banco FROM declaracionisr d LEFT JOIN pagoisr p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
+      'SELECT u.name as Proveedor, d.ejercicio as Ejercicio,d.periodo as Mes,d.numOperacion as Numero_de_Operacion,d.aCargoISR as Monto_ISR_Retenido_SyS,d.iva as Monto_IVA_Acreditable,d.iva as Monto_IVA_a_cargo,d.totalPagado as Total_declaracion,d.lineaCaptura as Linea_de_captura_declaracion,p.banco as Banco,p.fechaPago as Fecha_pago,p.totalAPagar as Total_Pago,p.lineaCaptura AS Linea_de_captura_banco FROM declaracionisr d LEFT JOIN pagoisr p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user = u.id;',
     );
-    console.log(rows);
     return rows as tablaDeclaracionISR[];
     //return invoices.rows;
   } catch (error) {
@@ -100,46 +137,25 @@ export async function fetchDeclaracionesISR() {
   }
 }
 
-export async function fetchDecIMSS() {
+export async function fetchDeclaracionesISRFiltered(id: string) {
   try {
-    const [rows, fields] = await db.execute('SELECT * FROM declaracionimss;');
-    return rows;
+    const [rows, fields] = await db.execute(
+      'SELECT u.name as Proveedor, d.ejercicio as Ejercicio,d.periodo as Mes,d.numOperacion as Numero_de_Operacion,d.aCargoISR as Monto_ISR_Retenido_SyS,d.iva as Monto_IVA_Acreditable,d.iva as Monto_IVA_a_cargo,d.totalPagado as Total_declaracion,d.lineaCaptura as Linea_de_captura_declaracion,p.banco as Banco,p.fechaPago as Fecha_pago,p.totalAPagar as Total_Pago,p.lineaCaptura AS Linea_de_captura_banco FROM declaracionisr d LEFT JOIN pagoisr p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user = u.id where d.id_user = ?;',
+      [id],
+    );
+    return rows as tablaDeclaracionISR[];
+    //return invoices.rows;
   } catch (error) {
-    console.log(error);
-    return error;
-  }
-}
-export async function getDecISR(query: string, data: declaracionISR[]) {
-  try {
-    const [result] = await db.execute(query, data);
-    await db.end();
-    return result;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-}
-export async function getPagoIMSS() {
-  try {
-    const [rows, fields] = await db.execute('SELECT * FROM pagoimss;');
-    return rows;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-}
-export async function getPagoISR(query: string, data: pagoISR[]) {
-  try {
-    const [rows, fields] = await db.execute(query, data);
-    await db.end();
-    return rows;
-  } catch (error) {
-    console.log(error);
-    return error;
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch DeclaracionesIMSS.');
   }
 }
 
-export async function readDecIMSS(buffer: Buffer, filename: string, id_user: string | null) {
+export async function readDecIMSS(
+  buffer: Buffer,
+  filename: string,
+  id_user: string | null,
+) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -168,11 +184,11 @@ export async function readDecIMSS(buffer: Buffer, filename: string, id_user: str
     console.log(json);
     try {
       const session = await auth();
-      let id
-      if (id_user){
-        id = id_user
-      }else{
-        id = session?.user?.name
+      let id;
+      if (id_user) {
+        id = id_user;
+      } else {
+        id = session?.user?.name;
       }
       if (id) {
         const [result] = await db.execute(
@@ -202,7 +218,11 @@ export async function readDecIMSS(buffer: Buffer, filename: string, id_user: str
   }
 }
 
-export async function readDecISR(buffer: Buffer, filename: string , id_user: string | null) {
+export async function readDecISR(
+  buffer: Buffer,
+  filename: string,
+  id_user: string | null,
+) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -231,11 +251,11 @@ export async function readDecISR(buffer: Buffer, filename: string , id_user: str
     console.log(json);
     try {
       const session = await auth();
-      let id
-      if (id_user){
-        id = id_user
-      }else{
-        id = session?.user?.name
+      let id;
+      if (id_user) {
+        id = id_user;
+      } else {
+        id = session?.user?.name;
       }
       if (id) {
         const [result] = await db.execute(
@@ -270,7 +290,11 @@ export async function readDecISR(buffer: Buffer, filename: string , id_user: str
   }
 }
 
-export async function readPagoIMSS(buffer: Buffer, filename: string, id_user: string | null) {
+export async function readPagoIMSS(
+  buffer: Buffer,
+  filename: string,
+  id_user: string | null,
+) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -299,11 +323,11 @@ export async function readPagoIMSS(buffer: Buffer, filename: string, id_user: st
     console.log(json);
     try {
       const session = await auth();
-      let id
-      if (id_user){
-        id = id_user
-      }else{
-        id = session?.user?.name
+      let id;
+      if (id_user) {
+        id = id_user;
+      } else {
+        id = session?.user?.name;
       }
       if (id) {
         const [result] = await db.execute(
@@ -338,7 +362,11 @@ export async function readPagoIMSS(buffer: Buffer, filename: string, id_user: st
   }
 }
 
-export async function readPagoISR(buffer: Buffer, filename: string, id_user: string | null) {
+export async function readPagoISR(
+  buffer: Buffer,
+  filename: string,
+  id_user: string | null,
+) {
   const client = new OpenAI({ apiKey: process.env.OPEN_AI_API_KEY });
   const image_url = 'data:image/jpeg;base64,' + buffer.toString('base64');
   const response = await client.chat.completions.create({
@@ -367,11 +395,11 @@ export async function readPagoISR(buffer: Buffer, filename: string, id_user: str
     console.log(json);
     try {
       const session = await auth();
-      let id
-      if (id_user){
-        id = id_user
-      }else{
-        id = session?.user?.name
+      let id;
+      if (id_user) {
+        id = id_user;
+      } else {
+        id = session?.user?.name;
       }
       if (id) {
         const [result] = await db.execute(
@@ -521,4 +549,3 @@ export async function fetchRFC() {
     throw new Error('Failed to fetch all files');
   }
 }
-

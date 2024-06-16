@@ -103,7 +103,7 @@ export type declaracionIMSS = {
   ejercicio: string;
 };
 export type tablaGenerales = {
-  id?: string;
+  idG?: string;
   id_user?: string;
   Ejercicio?: string;
   Mes?: string;
@@ -115,6 +115,11 @@ export type tablaGenerales = {
   Objeto_social?: string;
   Resumen_contrato_IA?: string;
   Numero_de_empleados?: string;
+  id?: string;
+  name?: string;
+  rfc?: string;
+  password?: string;
+  role?: string;
 };
 export type tablaDeclaracionISR = {
   rfc?: string;
@@ -126,7 +131,7 @@ export type tablaDeclaracionISR = {
   ejercicioP?: string;
 };
 export type tablaDeclaracionIMSS = {
-  rfc?: string;
+  name?: string;
   lineaCaptura?: string;
   periodoPago?: string;
   ejercicio?: string;

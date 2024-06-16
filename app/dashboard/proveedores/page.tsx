@@ -1,6 +1,5 @@
 import { fetchUsers } from '@/app/lib/data';
 import { ProveedoresTableType } from '@/app/lib/definitions';
-import InvoicesTable from '@/app/ui/dashboard/table';
 import { lusitana } from '@/app/ui/fonts';
 import CustomersTable from '@/app/ui/proveedores/table';
 import { auth } from '@/auth';

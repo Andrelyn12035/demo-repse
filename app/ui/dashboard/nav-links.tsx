@@ -12,75 +12,90 @@ let links = [];
 
 export default function NavLinks({ role }: { role: boolean }) {
   const pathname = usePathname();
-  console.log('role: ' + role);
 
   if (!role) {
     links = [
-      { name: 'Controles generales', href: '/dashboard', icon: HomeIcon },
+      {
+        name: 'Controles generales',
+        href: '/company/dashboard',
+        icon: HomeIcon,
+      },
       {
         name: 'Declaraciones federales y pago',
-        href: '/dashboard/federales',
+        href: '/company/dashboard/federales',
         icon: HomeIcon,
       },
       {
         name: 'Declaraciones seguridad social y pago',
-        href: '/dashboard/imss',
+        href: '/company/dashboard/imss',
         icon: HomeIcon,
       },
-      { name: 'Recibos de nómina', href: '/dashboard/nomina', icon: HomeIcon },
+      {
+        name: 'Recibos de nómina',
+        href: '/company/dashboard/nomina',
+        icon: HomeIcon,
+      },
       {
         name: 'Complementos de pago pendientes',
-        href: '/dashboard/complemento',
+        href: '/company/dashboard/complemento',
         icon: HomeIcon,
       },
       {
         name: 'Tableau',
-        href: '/dashboard/tableau',
+        href: '/company/dashboard/tableau',
         icon: HomeIcon,
       },
       {
         name: 'PowerBI',
-        href: '/dashboard/powerbi',
+        href: '/company/dashboard/powerbi',
         icon: HomeIcon,
       },
       {
         name: 'Documentos',
-        href: '/dashboard/documents',
+        href: '/company/dashboard/documents',
         icon: DocumentDuplicateIcon,
       },
     ];
   } else {
     links = [
-      { name: 'Controles generales', href: '/dashboard', icon: HomeIcon },
+      {
+        name: 'Controles generales',
+        href: '/company/dashboard',
+        icon: HomeIcon,
+      },
       {
         name: 'Declaraciones federales y pago',
-        href: '/dashboard/federales',
+        href: '/company/dashboard/federales',
         icon: HomeIcon,
       },
       {
         name: 'Declaraciones seguridad social y pago',
-        href: '/dashboard/imss',
+        href: '/company/dashboard/imss',
         icon: HomeIcon,
       },
-      { name: 'Recibos de nómina', href: '/dashboard/nomina', icon: HomeIcon },
+      {
+        name: 'Recibos de nómina',
+        href: '/company/dashboard/nomina',
+        icon: HomeIcon,
+      },
       {
         name: 'Complementos de pago pendientes ',
-        href: '/dashboard/complemento',
+        href: '/company/dashboard/complemento',
         icon: HomeIcon,
       },
       {
         name: 'Tableau',
-        href: '/dashboard/tableau',
+        href: '/company/dashboard/tableau',
         icon: HomeIcon,
       },
       {
         name: 'PowerBI',
-        href: '/dashboard/powerbi',
+        href: '/company/dashboard/powerbi',
         icon: HomeIcon,
       },
       {
         name: 'Documentos',
-        href: '/dashboard/documentsAdmin',
+        href: '/company/dashboard/documentsAdmin',
         icon: DocumentDuplicateIcon,
       },
     ];
@@ -100,7 +115,10 @@ export default function NavLinks({ role }: { role: boolean }) {
               },
             )}
           >
-            <LinkIcon className="w-6" />
+            {link.icon === DocumentDuplicateIcon && (
+              <LinkIcon className="w-6" />
+            )}
+
             <p className="hidden md:block">{link.name}</p>
           </Link>
         );

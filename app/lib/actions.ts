@@ -1,8 +1,7 @@
 'use server';
-import { signIn } from '@/auth';
+import { signIn, signOut } from '@/auth';
 import { AuthError } from 'next-auth';
 import {
-  fetchDecIMSS,
   readDecIMSS,
   readDecISR,
   readPagoIMSS,
@@ -33,22 +32,8 @@ export async function authenticate(
     throw error;
   }
 }
-
-export async function getDecIMSS() {
-  try {
-    const decIMSS = await fetchDecIMSS();
-    return decIMSS;
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
-      }
-    }
-    throw error;
-  }
+export async function out() {
+  await signOut();
 }
 /*
 export async function uploadFiles(formData: FormData) {
@@ -118,7 +103,6 @@ export async function uploadFiles(formData: FormData) {
       let buffer = Buffer.from(await file.arrayBuffer());
       const fileType = '.' + file.type.split('/')[1];
       const outputFileName = `yourfilenamehere${i}${fileType}`;
-      
     }
     i++;
   }

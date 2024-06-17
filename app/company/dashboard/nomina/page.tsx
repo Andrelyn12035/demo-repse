@@ -1,11 +1,12 @@
 'use client';
 import { lusitana } from '@/app/ui/fonts';
 import Table from '@/app/ui/dashboard/table';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { fetchNomina, fetchNominaFiltered } from '@/app/lib/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { tablaNomina } from '@/app/lib/definitions';
 import { useSession } from 'next-auth/react';
+import { filters } from '@/app/company/dashboard/layout';
 export default function Page() {
   const session = useSession();
   const user = session?.data?.user;
@@ -60,19 +61,37 @@ export default function Page() {
     ],
     [],
   );
+  const context = useContext(filters);
+  const [original, setOriginal] = useState<tablaNomina[]>([]);
   const [data, setData] = useState<tablaNomina[]>([]);
+  const applyFilters = (data: tablaNomina[]) => {
+    let temp = data;
+    if (context.rfc !== '') {
+      temp = temp.filter((row) => row.name === context.rfc);
+    }
+    if (context.ejercicio !== '') {
+      temp = temp.filter((row) => row.Ejercicio === context.ejercicio);
+    }
+    if (context.periodo !== '') {
+      temp = temp.filter((row) => row.Mes === context.periodo);
+    }
+    setData(temp);
+  };
+  useEffect(() => {
+    applyFilters(original);
+  }, [context, original]);
   useEffect(() => {
     const fetchAdmin = async () => {
       const response = await fetchNomina();
       if (response) {
-        setData(response);
+        setOriginal(response);
       }
     };
     const fetch = async () => {
       console.log('name: ', user?.name);
       const response = await fetchNominaFiltered(user?.name as string);
       if (response) {
-        setData(response);
+        setOriginal(response);
       }
     };
     if (user?.image === '1' || user?.image === '2') {

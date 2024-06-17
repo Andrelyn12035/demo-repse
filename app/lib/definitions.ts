@@ -122,10 +122,10 @@ export type tablaGenerales = {
   role?: string;
 };
 export type tablaDeclaracionISR = {
-  rfc?: string;
   lineaCaptura?: string;
-  periodoPago?: string;
-  ejercicio?: string;
+  Proveedor?: string;
+  Mes?: string;
+  Ejercicio?: string;
   lineaP?: string;
   periodoP?: string;
   ejercicioP?: string;
@@ -137,11 +137,14 @@ export type tablaDeclaracionIMSS = {
   ejercicio?: string;
   lineaP?: string;
   periodoP?: string;
+  Proveedor?: string;
+  Mes?: string;
+  Ejercicio?: string;
   ejercicioP?: string;
 };
 export type tablaNomina = {
   id?: string;
-  id_user?: string;
+  name?: string;
   Ejercicio?: string;
   Mes?: string;
   RFC_Emisor?: string;
@@ -226,4 +229,10 @@ export interface fileData {
   path: string;
   name: string;
   id_user: string;
+}
+
+export interface Props {
+  rfc: string;
+  ejercicio: string;
+  periodo: string;
 }

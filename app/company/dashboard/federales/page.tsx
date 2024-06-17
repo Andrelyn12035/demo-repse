@@ -1,17 +1,19 @@
 'use client';
 import Table from '@/app/ui/dashboard/table';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import {
-  fetchDeclaracionesIMSS,
-  fetchFilteredDeclaracionesIMSS,
+  fetchDeclaracionesISR,
+  fetchDeclaracionesISRFiltered,
+  fetchNomina,
 } from '@/app/lib/data';
 import { ColumnDef } from '@tanstack/react-table';
-import { tablaDeclaracionIMSS } from '@/app/lib/definitions';
+import { tablaDeclaracionISR } from '@/app/lib/definitions';
 import { useSession } from 'next-auth/react';
+import { filters } from '@/app/company/dashboard/layout';
 export default function Page() {
   const session = useSession();
   const user = session?.data?.user;
-  const cols = useMemo<ColumnDef<tablaDeclaracionIMSS>[]>(
+  const cols = useMemo<ColumnDef<tablaDeclaracionISR>[]>(
     () => [
       {
         header: 'Proveedor',
@@ -29,19 +31,34 @@ export default function Page() {
         accessorKey: 'Mes',
       },
       {
-        header: 'Registro Patronal',
+        header: 'Numero de operación',
         cell: (row: any) => row.renderValue(),
-        accessorKey: 'Registro_patronal',
+        accessorKey: 'Numero_de_Operacion',
       },
       {
-        header: 'Total a Pagar',
+        header: 'Monto ISR Retenido SyS',
         cell: (row: any) => row.renderValue(),
-        accessorKey: 'Total_a_pagar',
+        accessorKey: 'Monto_ISR_Retenido_SyS',
       },
       {
-        header: 'Línea de Captura SIPARE',
+        header: 'Monto IVA Acreditable',
         cell: (row: any) => row.renderValue(),
-        accessorKey: 'Linea_de_captura_SIPARE',
+        accessorKey: 'Monto_IVA_Acreditable',
+      },
+      {
+        header: 'Monto IVA a cargo (a favor)',
+        cell: (row: any) => row.renderValue(),
+        accessorKey: 'Monto_IVA_a_cargo',
+      },
+      {
+        header: 'Total declaracion',
+        cell: (row: any) => row.renderValue(),
+        accessorKey: 'Total_declaracion',
+      },
+      {
+        header: 'Linea de captura declaracion',
+        cell: (row: any) => row.renderValue(),
+        accessorKey: 'Linea_de_captura_declaracion',
       },
       {
         header: 'Banco',
@@ -55,7 +72,7 @@ export default function Page() {
         accessorKey: 'Banco',
       },
       {
-        header: 'Fecha de Pago',
+        header: 'Fecha pago',
         cell: (row: any) => {
           return row.getValue() === null ? (
             <span className=" font-bold text-red-700">Sin información</span>
@@ -77,7 +94,7 @@ export default function Page() {
         accessorKey: 'Total_Pago',
       },
       {
-        header: 'Línea de Captura Banco',
+        header: 'Linea de captura banco',
         cell: (row: any) => {
           return row.getValue() === null ? (
             <span className=" font-bold text-red-700">Sin información</span>
@@ -90,22 +107,39 @@ export default function Page() {
     ],
     [],
   );
-
-  const [data, setData] = useState<tablaDeclaracionIMSS[]>([]);
+  const context = useContext(filters);
+  const [original, setOriginal] = useState<tablaDeclaracionISR[]>([]);
+  const [data, setData] = useState<tablaDeclaracionISR[]>([]);
+  const applyFilters = (data: tablaDeclaracionISR[]) => {
+    let temp = data;
+    if (context.rfc !== '') {
+      temp = temp.filter((row) => row.Proveedor === context.rfc);
+    }
+    if (context.ejercicio !== '') {
+      temp = temp.filter((row) => row.Ejercicio === context.ejercicio);
+    }
+    if (context.periodo !== '') {
+      temp = temp.filter((row) => row.Mes === context.periodo);
+    }
+    setData(temp);
+  };
+  useEffect(() => {
+    applyFilters(original);
+  }, [context, original]);
   useEffect(() => {
     const fetchAdmin = async () => {
-      const response = await fetchDeclaracionesIMSS();
+      const response = await fetchDeclaracionesISR();
       if (response) {
-        setData(response);
+        setOriginal(response);
       }
     };
     const fetch = async () => {
       console.log('name: ', user?.name);
-      const response = await fetchFilteredDeclaracionesIMSS(
+      const response = await fetchDeclaracionesISRFiltered(
         user?.name as string,
       );
       if (response) {
-        setData(response);
+        setOriginal(response);
       }
     };
     if (user?.image === '1' || user?.image === '2') {

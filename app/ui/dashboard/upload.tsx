@@ -6,7 +6,7 @@ import { uploadFiles } from '@/app/lib/actions';
 import Modal from '@/app/ui/documents/modal';
 import { Button } from '@/app/ui/button';
 import { usePathname } from 'next/navigation';
-import { idContext } from '@/app/dashboard/documentsAdmin/idContextProvider';
+import { idContext } from '@/app/company/dashboard/documentsAdmin/idContextProvider';
 
 export const Upload = ({ role }: { role: boolean }) => {
   const [files, setFiles] = useState<FileList | null>(null);

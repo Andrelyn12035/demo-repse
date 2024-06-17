@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { fileData, fileInfo } from '@/app/lib/definitions';
 import { useContext, useEffect, useState } from 'react';
 import { fetchFiles } from '@/app/lib/data';
-import { idContext } from '@/app/dashboard/documentsAdmin/idContextProvider';
+import { idContext } from '@/app/company/dashboard/documentsAdmin/idContextProvider';
 
 type FileLinksProps = {
   links: fileData[];

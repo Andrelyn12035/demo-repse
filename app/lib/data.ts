@@ -23,7 +23,6 @@ export async function fetchGenerales() {
     const [rows, fields] = await db.execute(
       'select * from generales g left join users u on g.id_user = u.id',
     );
-    console.log(rows);
     return rows as tablaGenerales[];
     //return invoices.rows;
   } catch (error) {
@@ -74,7 +73,6 @@ export async function fetchNomina() {
     const [rows, fields] = await db.execute(
       'SELECT  * from recibos r left join users u on r.id_user = u.id;',
     );
-    console.log(rows);
     return rows as tablaGenerales[];
     //return invoices.rows;
   } catch (error) {
@@ -88,7 +86,6 @@ export async function fetchNominaFiltered(id: string) {
       'SELECT  * from recibos r left join users u on r.id_user = u.id where r.id_user = ?;',
       [id],
     );
-    console.log(rows);
     return rows as tablaGenerales[];
     //return invoices.rows;
   } catch (error) {
@@ -115,7 +112,6 @@ export async function fetchDeclaracionesIMSS() {
     const [rows, fields] = await db.execute(
       'SELECT u.name as Proveedor, d.ejercicio as Ejercicio, d.periodoPago as Mes, d.registroPatronal as Registro_patronal, d.total as Total_a_pagar, d.lineaCaptura as Linea_de_captura_SIPARE, p.banco as Banco, p.fechaPago as Fecha_pago, p.totalAPagar as Total_Pago, p.lineaCaptura AS Linea_de_captura_banco FROM declaracionimss d LEFT JOIN pagoimss p ON d.lineaCaptura =  p.lineaCaptura left join users u on d.id_user= u.id;',
     );
-    console.log(rows);
     return rows as tablaDeclaracionIMSS[];
     //return invoices.rows;
   } catch (error) {
@@ -541,6 +537,20 @@ export async function fetchRFC() {
     if (session?.user?.name) {
       const [rows, fields] = await db.execute<RowDataPacket[]>(
         'SELECT rfc AS name FROM users WHERE role = 3',
+      );
+      return rows as Data[];
+    }
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all files');
+  }
+}
+export async function fetchRS() {
+  try {
+    const session = await auth();
+    if (session?.user?.name) {
+      const [rows, fields] = await db.execute<RowDataPacket[]>(
+        'SELECT name AS name FROM users WHERE role = 3',
       );
       return rows as Data[];
     }

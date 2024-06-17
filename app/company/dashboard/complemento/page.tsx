@@ -1,12 +1,14 @@
 'use client';
 import { lusitana } from '@/app/ui/fonts';
 import Table from '@/app/ui/dashboard/table';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useContext } from 'react';
 import { fetchComplemento, fetchComplementoFiltered } from '@/app/lib/data';
 import { ColumnDef } from '@tanstack/react-table';
-import { tablaComplemento } from '@/app/lib/definitions';
+import { tablaComplemento, Props } from '@/app/lib/definitions';
 import { useSession } from 'next-auth/react';
+import { filters } from '@/app/company/dashboard/layout';
 export default function Page() {
+  const context = useContext(filters);
   const session = useSession();
   const user = session?.data?.user;
   const cols = useMemo<ColumnDef<tablaComplemento>[]>(

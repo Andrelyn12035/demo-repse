@@ -1,10 +1,11 @@
 'use client';
 import Table from '@/app/ui/dashboard/table';
-import { useEffect, useMemo, useState } from 'react';
+import { use, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchGenerales, fetchGeneralesFiltered } from '@/app/lib/data';
 import { tablaGenerales } from '@/app/lib/definitions';
 import { ColumnDef } from '@tanstack/react-table';
 import { useSession } from 'next-auth/react';
+import { filters } from '@/app/company/dashboard/layout';
 export default function Page() {
   const session = useSession();
   const user = session?.data?.user;
@@ -80,19 +81,37 @@ export default function Page() {
     ],
     [],
   );
+  const context = useContext(filters);
+  const [original, setOriginal] = useState<tablaGenerales[]>([]);
   const [data, setData] = useState<tablaGenerales[]>([]);
+  const applyFilters = (data: tablaGenerales[]) => {
+    let temp = data;
+    if (context.rfc !== '') {
+      temp = temp.filter((row) => row.name === context.rfc);
+    }
+    if (context.ejercicio !== '') {
+      temp = temp.filter((row) => row.Ejercicio === context.ejercicio);
+    }
+    if (context.periodo !== '') {
+      temp = temp.filter((row) => row.Mes === context.periodo);
+    }
+    setData(temp);
+  };
+  useEffect(() => {
+    applyFilters(original);
+  }, [context, original]);
   useEffect(() => {
     const fetchAdmin = async () => {
       const response = await fetchGenerales();
       if (response) {
-        setData(response);
+        setOriginal(response);
       }
     };
     const fetch = async () => {
       console.log('name: ', user?.name);
       const response = await fetchGeneralesFiltered(user?.name as string);
       if (response) {
-        setData(response);
+        setOriginal(response);
       }
     };
     if (user?.image === '1' || user?.image === '2') {
@@ -103,7 +122,6 @@ export default function Page() {
   }, [user]);
   return (
     <main>
-      <h1 className={` mb-4 text-xl md:text-2xl`}>Controles generales</h1>
       <div className="max-w-full">
         <Table columns={cols} data={data} />
       </div>

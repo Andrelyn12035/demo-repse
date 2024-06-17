@@ -41,18 +41,13 @@ export default function NavLinks({ role }: { role: boolean }) {
         icon: HomeIcon,
       },
       {
-        name: 'Tableau',
-        href: '/company/dashboard/tableau',
-        icon: HomeIcon,
-      },
-      {
         name: 'PowerBI',
-        href: '/company/dashboard/powerbi',
+        href: '/company/powerbi',
         icon: HomeIcon,
       },
       {
         name: 'Documentos',
-        href: '/company/dashboard/documents',
+        href: '/company/documents',
         icon: DocumentDuplicateIcon,
       },
     ];
@@ -84,18 +79,13 @@ export default function NavLinks({ role }: { role: boolean }) {
         icon: HomeIcon,
       },
       {
-        name: 'Tableau',
-        href: '/company/dashboard/tableau',
-        icon: HomeIcon,
-      },
-      {
         name: 'PowerBI',
-        href: '/company/dashboard/powerbi',
+        href: '/company/powerbi',
         icon: HomeIcon,
       },
       {
         name: 'Documentos',
-        href: '/company/dashboard/documentsAdmin',
+        href: '/company/documentsAdmin',
         icon: DocumentDuplicateIcon,
       },
     ];

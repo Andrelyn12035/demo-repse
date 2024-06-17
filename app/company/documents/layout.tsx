@@ -2,7 +2,6 @@
 import Breadcrumbs from '@/app/ui/documents/breadcrumbs';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import IdContextProvider, { idContext } from './idContextProvider';
 
 interface Breadcrumb {
   name: string;
@@ -21,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   bread.map((crumb, index) => {
     path = path + crumb + '/';
     if (index === bread.length - 1) {
-      if (crumb === 'documentsAdmin') {
+      if (crumb === 'documents') {
         breadcrumbs.push({ name: 'Documents', href: path, active: true });
       } else {
         breadcrumbs.push({
@@ -31,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         });
       }
     } else {
-      if (crumb === 'documentsAdmin') {
+      if (crumb === 'documents') {
         breadcrumbs.push({ name: 'Documents', href: path, active: false });
       } else {
         breadcrumbs.push({
@@ -45,9 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Breadcrumbs breadcrumbs={breadcrumbs} />
-      <IdContextProvider>
-        <div className="w-full">{children}</div>
-      </IdContextProvider>
+      <div className="w-full pt-5">{children}</div>
     </>
   );
 }
